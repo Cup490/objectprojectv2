@@ -1,24 +1,36 @@
 public class Lecturer {
-private String name;
-private int id;
-private String TypeOfDegree;
-private enum  LevelOfDegree {Bachelors, Masters, prof};
-private int pay;
-private Departments depart;
+    private final LevelOfDegree levelOfDegree;
+    private String name;
+    private String id;
+    private String typeOfDegree;
+    private static enum LevelOfDegree {Bachelors, Masters, doctor, prof}
+    private double pay;
+    private Departments depart;
 
-    public Lecturer(String name, int id, String typeOfDegree, int pay) {
-        this.name = name;
-        this.id = id;
-        TypeOfDegree = typeOfDegree;
+    public Lecturer(String name, String id, String typeOfDegree, double pay,String levelOfDegree) {
+        this.setName(name);
+        this.setId(id);
+        this.typeOfDegree = typeOfDegree;
+        this.levelOfDegree = LevelOfDegree.valueOf(levelOfDegree);
         this.pay = pay;
     }
+    public boolean IsDoctor() {
+    if (this.levelOfDegree == LevelOfDegree.doctor || this.levelOfDegree == LevelOfDegree.prof ) {
+        return true;
+    }
+    return false;
+    }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(String id) {
+        if (id != null && id.matches("//d{9}")) {
+            this.id = id;
+        } else {
+            throw new IllegalArgumentException("ID cannot exceed 9 characters.");
+        }
     }
 
     public String getName() {
@@ -26,22 +38,27 @@ private Departments depart;
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name != "" && name.matches("[a-zA-Z]+")) {
+            this.name = name;
+        } else {
+            throw new IllegalArgumentException("Name can only have letters.");
+        }
     }
 
+
     public String getTypeOfDegree() {
-        return TypeOfDegree;
+        return typeOfDegree;
     }
 
     public void setTypeOfDegree(String typeOfDegree) {
-        TypeOfDegree = typeOfDegree;
+        this.typeOfDegree = typeOfDegree;
     }
 
-    public int getPay() {
+    public double getPay() {
         return pay;
     }
 
-    public void setPay(int pay) {
+    public void setPay(double pay) {
         this.pay = pay;
     }
 
@@ -52,4 +69,5 @@ private Departments depart;
     public void setDepart(Departments depart) {
         this.depart = depart;
     }
+
 }
