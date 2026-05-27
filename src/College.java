@@ -1,96 +1,105 @@
 public class College {
     private String uni;
-    private int Lecturercount = 0;
+    private int lecturerCount = 0;
     private int committeeCount = 0;
-    private Lecturer[] arraylecturer = new Lecturer[1];
-    private Commities[] arrayCommittees = new Commities[1];
+    private int departmentCount = 0;
+    private Lecturer[] lecturers = new Lecturer[1];
+    private Committee[] committees = new Committee[1];
+    private Department[] departments = new Department[1];
+
     public College(String uni) {
         this.uni = uni;
     }
 
-    public boolean isvalid(Lecturer searchLecturer) { // is the lecturer valid
-        boolean lecturerbool = false;
-        for (int i = 0; i < Lecturercount; i++) {
-            if (arraylecturer[i].equals(searchLecturer)) {
-                lecturerbool = true;
+    public boolean isValid(Lecturer searchLecturer) {
+        boolean isLecturerValid = false;
+        for (int i = 0; i < lecturerCount; i++) {
+            if (lecturers[i].equals(searchLecturer)) {
+                isLecturerValid = true;
                 break;
             }
         }
-        return lecturerbool;
+        return isLecturerValid;
     }
-    public boolean isvalid(String name) {
+
+    public boolean isValid(String name) {
         for (int i = 0; i < committeeCount; i++) {
-            if (arrayCommittees[i].getName().equalsIgnoreCase(name)) {
+            if (committees[i].getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
         return false;
     }
+
     public Lecturer findLecturerByName(String name) {
-        for (int i = 0; i < Lecturercount; i++) {
-            if (arraylecturer[i].getName().equalsIgnoreCase(name)) {
-                return arraylecturer[i];
+        for (int i = 0; i < lecturerCount; i++) {
+            if (lecturers[i].getName().equalsIgnoreCase(name)) {
+                return lecturers[i];
             }
         }
         return null;
     }
-    public void addItem(Lecturer newLecturer) {
-        if (!isvalid(newLecturer)) {
-            if (Lecturercount == arraylecturer.length) {
-                doubleArraySize();
-            }
-            arraylecturer[Lecturercount] = newLecturer;
-            Lecturercount++;
-        }
-    }
-    public boolean additem(String committeeName, String chairName) {
 
-        // תנאי 1: בדיקה שאין ועדה קיימת עם אותו השם
-        if (isvalid(committeeName)) {
-            System.out.println("the committee" + committeeName + "already exists in the college");
+    public boolean addLecturer(Lecturer newLecturer) {
+        if (!isValid(newLecturer)) {
+            if (lecturerCount == lecturers.length) {
+                doubleLecturerArraySize();
+            }
+            lecturers[lecturerCount] = newLecturer;
+            lecturerCount++;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addCommittee(String committeeName, String chairName) {
+        if (isValid(committeeName)) {
             return false;
         }
 
-        // תנאי 2: חיפוש המרצה במכללה לפי השם שנקלט
         Lecturer potentialChair = findLecturerByName(chairName);
         if (potentialChair == null) {
-            System.out.println("שגיאה: לא נמצא מרצה במכללה בשם " + chairName);
             return false;
         }
 
-        // תנאי 3: יצירת אובייקט הוועדה הזמני ובדיקת חוקי היו"ר (האם הוא ד"ר?)
-        Commities newCommittee = new Commities(committeeName);
+        Committee newCommittee = new Committee(committeeName);
 
-        // נשתמש במתודת setChairperson שכתבנו קודם שמחזירה true/false!
-        if (!newCommittee.setChairperson(potentialChair, this)) {
-            System.out.println("שגיאה: יצירת הוועדה נכשלה מכיוון שהיו\"ר אינו עומד בקריטריונים.");
+        if (!newCommittee.setChairPerson(potentialChair)) {
             return false;
         }
 
-        // אם עברנו את כל השלבים בהצלחה - נגדיל את המערך במידת הצורך ונשמור את הוועדה!
-        if (committeeCount == arrayCommittees.length) {
+        if (committeeCount == committees.length) {
             doubleCommitteeArraySize();
         }
 
-        arrayCommittees[committeeCount] = newCommittee;
+        committees[committeeCount] = newCommittee;
         committeeCount++;
 
-        System.out.println("הוועדה '" + committeeName + "' נוצרה בהצלחה עם היו\"ר " + chairName);
         return true;
     }
-    private void doubleArraySize() {
-        Lecturer[] newArr = new Lecturer[arraylecturer.length * 2];
-        for (int i = 0; i < arraylecturer.length; i++) {
-            newArr[i] = arraylecturer[i];
+
+    private void doubleLecturerArraySize() {
+        Lecturer[] newArr = new Lecturer[lecturers.length * 2];
+        for (int i = 0; i < lecturers.length; i++) {
+            newArr[i] = lecturers[i];
         }
-        arraylecturer = newArr;
+        lecturers = newArr;
     }
+
     private void doubleCommitteeArraySize() {
-        Commities[] newArr = new Commities[arrayCommittees.length * 2];
-        for (int i = 0; i < arrayCommittees.length; i++) {
-            newArr[i] = arrayCommittees[i];
+        Committee[] newArr = new Committee[committees.length * 2];
+        for (int i = 0; i < committees.length; i++) {
+            newArr[i] = committees[i];
         }
-        arrayCommittees = newArr;
+        committees = newArr;
+    }
+
+    public boolean addDepartment(Department newDepartment){
+
+    }
+
+    public boolean addLecturerToCommittee(String lecturerName, String committeeName){
+        
     }
 
     public String getUni() {
@@ -101,19 +110,19 @@ public class College {
         this.uni = uni;
     }
 
-    public int getLecturercount() {
-        return Lecturercount;
+    public int getLecturerCount() {
+        return lecturerCount;
     }
 
-    public void setLecturercount(int count) {
-        this.Lecturercount = count;
+    public void setLecturerCount(int count) {
+        this.lecturerCount = count;
     }
 
-    public Lecturer[] getArraylecturer() {
-        return arraylecturer;
+    public Lecturer[] getLecturers() {
+        return lecturers;
     }
 
-    public void setArraylecturer(Lecturer[] arraylecturer) {
-        this.arraylecturer = arraylecturer;
+    public void setLecturers(Lecturer[] lecturers) {
+        this.lecturers = lecturers;
     }
 }

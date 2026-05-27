@@ -5,7 +5,7 @@ public class Lecturer {
     private String typeOfDegree;
     private static enum LevelOfDegree {Bachelors, Masters, doctor, prof}
     private double pay;
-    private Departments depart;
+    private Department depart;
 
     public Lecturer(String name, String id, String typeOfDegree, double pay,String levelOfDegree) {
         this.setName(name);
@@ -14,7 +14,7 @@ public class Lecturer {
         this.levelOfDegree = LevelOfDegree.valueOf(levelOfDegree);
         this.pay = pay;
     }
-    public boolean IsDoctor() {
+    public boolean isDoctor() {
     if (this.levelOfDegree == LevelOfDegree.doctor || this.levelOfDegree == LevelOfDegree.prof ) {
         return true;
     }
@@ -62,11 +62,11 @@ public class Lecturer {
         this.pay = pay;
     }
 
-    public Departments getDepart() {
+    public Department getDepart() {
         return depart;
     }
 
-    public void setDepart(Departments depart) {
+    public void setDepart(Department depart) {
         this.depart = depart;
     }
 
