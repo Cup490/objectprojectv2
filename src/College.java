@@ -1,233 +1,228 @@
 public class College {
-    private String uni;
-    private int lecturersCount = 0;
-    private int committeesCount = 0;
-    private int departmentsCount = 0;
+    // תכונות
+    private String uniName;
     private Lecturer[] lecturers = new Lecturer[1];
     private Committee[] committees = new Committee[1];
     private Department[] departments = new Department[1];
-    public College(String uni) {
-        this.uni = uni;
+    private int lecturersCount = 0;
+    private int committeesCount = 0;
+    private int departmentsCount = 0;
+
+    // פעולה בונה
+    public College(String uniName) {
+        this.uniName = uniName;
     }
 
-    private boolean isValidLecturer(String lecturerId) {
-        for (int i = 0; i < this.lecturersCount; i++) {
-            if (this.lecturers[i].getId().equalsIgnoreCase(lecturerId)) {
+    // פעולות
+    public boolean addLecturer(Lecturer newLecturer) {
+        if (findLecturerByName(newLecturer.getLecturerName()) == null &&
+                findLecturerById(newLecturer.getId()) == null) {
+
+            if (lecturersCount == lecturers.length) {
+                doubleLecturerArraySize();
+            }
+            lecturers[lecturersCount++] = newLecturer;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addDepartment(Department department) {
+        if (findDepartmentByName(department.getDepartmentName()) == null) {
+            if (departmentsCount == departments.length) {
+                doubleDepartmentArraySize();
+            }
+            departments[departmentsCount++] = department;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addCommittee(String committeeName, String chairId) {
+        if (findCommitteeByName(committeeName) != null) {
+            return false;
+        }
+
+        Lecturer potentialChair = findLecturerById(chairId);
+        if (potentialChair == null || !potentialChair.isDoctor()) {
+            return false;
+        }
+
+        Committee newCommittee = new Committee(committeeName);
+        newCommittee.setChairPerson(potentialChair);
+        potentialChair.addCommittee(newCommittee);
+
+        if (committeesCount == committees.length) {
+            doubleCommitteeArraySize();
+        }
+        committees[committeesCount++] = newCommittee;
+        return true;
+    }
+
+    public boolean addLecturerToDepartment(String lecturerId, String departmentName) {
+        Lecturer lecturer = findLecturerById(lecturerId);
+        Department department = findDepartmentByName(departmentName);
+
+        if (lecturer != null && department != null && lecturer.getDepartment() == null) {
+            if (department.addLecturer(lecturer)) {
+                lecturer.setDepartment(department);
                 return true;
             }
         }
         return false;
     }
 
-    private boolean isValidCommittee(String committeeName) {
-        for (int i = 0; i < this.committeesCount; i++) {
-            if (this.committees[i].getCommitteeName().equalsIgnoreCase(committeeName)) {
+    public boolean addLecturerToCommittee(String lecturerId, String committeeName) {
+        Lecturer lecturer = findLecturerById(lecturerId);
+        Committee committee = findCommitteeByName(committeeName);
+
+        if (lecturer != null && committee != null) {
+            if (committee.addMember(lecturer)) {
+                lecturer.addCommittee(committee);
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isValidDepartment(String departmentName) {
-        for (int i = 0; i < this.departmentsCount; i++) {
-            if (this.departments[i].getDepartmentName().equalsIgnoreCase(departmentName)) {
+    public boolean removeMemberFromCommittee(String lecturerId, String committeeName) {
+        Lecturer lecturer = findLecturerById(lecturerId);
+        Committee committee = findCommitteeByName(committeeName);
+
+        if (lecturer != null && committee != null) {
+            if (committee.removeMember(lecturer)) {
+                lecturer.removeCommittee(committee);
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean updateChairman(String lecturerId, String committeeName) {
+        Lecturer newChair = findLecturerById(lecturerId);
+        Committee committee = findCommitteeByName(committeeName);
+
+        if (newChair != null && committee != null && newChair.isDoctor()) {
+            if (committee.getChairman() != null) {
+                committee.getChairman().removeCommittee(committee);
+            }
+
+            if (committee.getMemberIndex(lecturerId) != -1) {
+                committee.removeMember(newChair);
+            }
+
+            if (committee.setChairPerson(newChair)) {
+                newChair.addCommittee(committee);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public double getAveragePay() {
+        if (lecturersCount == 0) return 0.0;
+        double sum = 0.0;
+        for (int i = 0; i < lecturersCount; i++) {
+            sum += lecturers[i].getPay();
+        }
+        return sum / lecturersCount;
+    }
+
+    public double getAveragePayPerDepartment(String departmentName) {
+        Department department = findDepartmentByName(departmentName);
+        if (department == null || department.getLecturersCount() == 0) return 0.0;
+
+        double sum = 0.0;
+        for (int i = 0; i < department.getLecturersCount(); i++) {
+            sum += department.getLecturers()[i].getPay();
+        }
+        return sum / department.getLecturersCount();
+    }
+
+    // פעולות עזר
+    public Lecturer findLecturerById(String lecturerId) {
+        for (int i = 0; i < lecturersCount; i++) {
+            if (lecturers[i].getId().equals(lecturerId)) {
+                return lecturers[i];
+            }
+        }
+        return null;
     }
 
     public Lecturer findLecturerByName(String lecturerName) {
-        for (int i = 0; i < this.lecturersCount; i++) {
-            if (this.lecturers[i].getLecturerName().equalsIgnoreCase(lecturerName)) {
-                return this.lecturers[i];
+        for (int i = 0; i < lecturersCount; i++) {
+            if (lecturers[i].getLecturerName().equalsIgnoreCase(lecturerName)) {
+                return lecturers[i];
             }
         }
         return null;
     }
 
     public Committee findCommitteeByName(String committeeName) {
-        for (int i = 0; i < this.committeesCount; i++) {
-            if (this.committees[i].getCommitteeName().equalsIgnoreCase(committeeName)) {
-                return this.committees[i];
+        for (int i = 0; i < committeesCount; i++) {
+            if (committees[i].getCommitteeName().equalsIgnoreCase(committeeName)) {
+                return committees[i];
             }
         }
         return null;
     }
 
-    public boolean addLecturer(Lecturer newLecturer) {
-        if (!isValidLecturer(newLecturer.getId())) {
-            if (this.lecturersCount == this.lecturers.length) {
-                doubleLecturerArraySize();
+    public Department findDepartmentByName(String departmentName) {
+        for (int i = 0; i < departmentsCount; i++) {
+            if (departments[i].getDepartmentName().equalsIgnoreCase(departmentName)) {
+                return departments[i];
             }
-            this.lecturers[this.lecturersCount] = newLecturer;
-            this.lecturersCount++;
-            return true;
         }
-        return false;
-    }
-
-    public boolean updateChairman(Lecturer lecturer, Committee committee) {
-        Committee realCommittee = findCommitteeByName(committee.getCommitteeName());
-        if(realCommittee!=null){
-            return realCommittee.setChairPerson(lecturer);
-        }
-        return false;
-    }
-
-    public boolean removeMember(Lecturer lecturer, Committee committee) {
-        Committee realCommittee = findCommitteeByName(committee.getCommitteeName());
-        if(realCommittee!=null){
-            return realCommittee.removeMember(lecturer);
-        }
-        return false;
-    }
-
-    public double averagePay(){
-        double sum=0.0;
-        for(int i = 0; i<this.lecturersCount; i++){
-            sum+=this.lecturers[i].getPay();
-        }
-        return sum/this.lecturersCount;
-    }
-
-    public double averagePayPerDepartment(Department department){
-        double sum=0.0;
-        for(int i = 0; i<department.getLecturersCount(); i++){
-            sum+=department.getLecturers()[i].getPay();
-        }
-        return sum/department.getLecturersCount();
-    }
-
-    public boolean addLecturerToDepartment(Lecturer lecturer,Department department){
-        if(this.isValidDepartment(department.getDepartmentName()) && lecturer.getDepartment()==null){
-             boolean wasAdded = department.addLecturer(lecturer);
-             if(wasAdded){
-                 lecturer.setDepartment(department);
-                 return true;
-             }
-        }
-        return false;
-    }
-
-    public boolean addCommittee(String committeeName, String chairName) {
-        if (isValidCommittee(committeeName)) {
-            return false;
-        }
-
-        Lecturer potentialChair = findLecturerByName(chairName);
-        if (potentialChair == null) {
-            return false;
-        }
-
-        Committee newCommittee = new Committee(committeeName);
-
-        if (!newCommittee.setChairPerson(potentialChair)) {
-            return false;
-        }
-
-        if (this.committeesCount == this.committees.length) {
-            doubleCommitteeArraySize();
-        }
-
-        this.committees[this.committeesCount] = newCommittee;
-        this.committeesCount++;
-
-        return true;
+        return null;
     }
 
     private void doubleLecturerArraySize() {
-        Lecturer[] newLecturers = new Lecturer[this.lecturers.length * 2];
-        for (int i = 0; i < this.lecturers.length; i++) {
-            newLecturers[i] = this.lecturers[i];
-        }
-        this.lecturers = newLecturers;
+        Lecturer[] newArr = new Lecturer[lecturers.length * 2];
+        for (int i = 0; i < lecturersCount; i++) newArr[i] = lecturers[i];
+        lecturers = newArr;
     }
 
     private void doubleCommitteeArraySize() {
-        Committee[] newArr = new Committee[this.committees.length * 2];
-        for (int i = 0; i < this.committees.length; i++) {
-            newArr[i] = this.committees[i];
-        }
-        this.committees = newArr;
+        Committee[] newArr = new Committee[committees.length * 2];
+        for (int i = 0; i < committeesCount; i++) newArr[i] = committees[i];
+        committees = newArr;
     }
 
     private void doubleDepartmentArraySize() {
-        Department[] newArr = new Department[this.departments.length * 2];
-        for (int i = 0; i < this.departments.length; i++) {
-            newArr[i] = this.departments[i];
+        Department[] newArr = new Department[departments.length * 2];
+        for (int i = 0; i < departmentsCount; i++) newArr[i] = departments[i];
+        departments = newArr;
+    }
+
+    // get & set
+    public String getUniName() {
+        return uniName;
+    }
+
+    public void setUniName(String uniName) {
+        this.uniName = uniName;
+    }
+
+    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+
+    // הדפסות
+    public String printLecturers() {
+        if (lecturersCount == 0) return "No lecturers yet.";
+
+        StringBuilder print = new StringBuilder();
+        for (int i = 0; i < lecturersCount; i++) {
+            print.append(lecturers[i].toString()).append("\n");
         }
-        this.departments = newArr;
+        return print.toString();
     }
 
-    public boolean addDepartment(Department department) {
-        if(isValidDepartment(department.getDepartmentName())){
-           return false;
+    public String printCommittees() {
+        if (committeesCount == 0) return "No committees yet.";
+
+        StringBuilder print = new StringBuilder();
+        for (int i = 0; i < committeesCount; i++) {
+            print.append(committees[i].toString()).append("\n");
         }
-
-        if (this.departmentsCount == this.departments.length) {
-            this.doubleDepartmentArraySize();
-        }
-
-        this.departments[this.departmentsCount] = department;
-        this.departmentsCount++;
-        return true;
-    }
-
-    public boolean addLecturerToCommittee(String lecturerName, String committeeName){
-        if(findLecturerByName(lecturerName) != null && isValidCommittee(committeeName)){
-            Lecturer lecturer = findLecturerByName(lecturerName);
-            Committee committee = findCommitteeByName(committeeName);
-            return committee.addMember(lecturer);
-        }
-        return false;
-    }
-
-    public String getUni() {
-        return this.uni;
-    }
-
-    public void setUni(String uni) {
-        this.uni = uni;
-    }
-
-    public int getLecturersCount() {
-        return this.lecturersCount;
-    }
-
-    public void setLecturersCount(int count) {
-        this.lecturersCount = count;
-    }
-
-    public Lecturer[] getLecturers() {
-        return this.lecturers;
-    }
-
-    public void setLecturers(Lecturer[] lecturers) {
-        this.lecturers = lecturers;
-    }
-
-    public String printLecturers(){
-        String lecturersPrint = "";
-        for(int i = 0; i<this.lecturersCount; i++){
-            lecturersPrint = lecturersPrint + this.lecturers[i].toString() + "\n";
-        }
-        if (!lecturersPrint.isEmpty()) {
-            return lecturersPrint;
-        } else {
-            return "No lecturers yet.";
-        }
-    }
-
-    public String printCommittees(){
-        String committeesPrint = "";
-        for(int i = 0; i<this.committeesCount; i++){
-            committeesPrint = committeesPrint + this.committees[i].toString() + "\n";
-        }
-        if (!committeesPrint.isEmpty()) {
-            return committeesPrint;
-        } else {
-            return "No committees yet.";
-        }
+        return print.toString();
     }
 }

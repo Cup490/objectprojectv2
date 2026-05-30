@@ -1,5 +1,6 @@
 public class Lecturer {
-    private enum LevelOfDegree {
+    // תכונות
+    public enum LevelOfDegree {
         BACHELORS, MASTERS, DOCTOR, PROF
     }
     private String lecturerName;
@@ -8,9 +9,10 @@ public class Lecturer {
     private LevelOfDegree levelOfDegree;
     private double pay;
     private Department department;
-    private int committeesCount = 0;
     private Committee[] committees = new Committee[1];
+    private int committeesCount = 0;
 
+    // פעולה בונה
     public Lecturer(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree) {
         this.setLecturerName(lecturerName);
         this.setId(id);
@@ -19,47 +21,61 @@ public class Lecturer {
         this.pay = pay;
     }
 
+    // פעולות
     public boolean isDoctor() {
-        return this.levelOfDegree == LevelOfDegree.DOCTOR || this.levelOfDegree == LevelOfDegree.PROF;
+        return levelOfDegree == LevelOfDegree.DOCTOR || levelOfDegree == LevelOfDegree.PROF;
     }
 
-    private int getCommitteeIndex(String committeeName){
-        for(int i = 0; i<this.committeesCount; i++){
-            if(this.committees[i].getCommitteeName().equalsIgnoreCase(committeeName)){
+    public boolean addCommittee(Committee committee) {
+        if (getCommitteeIndex(committee.getCommitteeName()) != -1) {
+            return false;
+        }
+        if (committeesCount == committees.length) {
+            doubleCommitteesArraySize();
+        }
+        committees[committeesCount++] = committee;
+        return true;
+    }
+
+    public boolean removeCommittee(Committee committee) {
+        int index = getCommitteeIndex(committee.getCommitteeName());
+        if (index != -1) {
+            committees[index] = committees[--committeesCount];
+            committees[committeesCount] = null;
+            return true;
+        }
+        return false;
+    }
+
+    // פעולות עזר
+    private void doubleCommitteesArraySize() {
+        Committee[] newCommittees = new Committee[committees.length * 2];
+        for (int i = 0; i < committeesCount; i++) {
+            newCommittees[i] = committees[i];
+        }
+        committees = newCommittees;
+    }
+
+    private int getCommitteeIndex(String committeeName) {
+        for (int i = 0; i < committeesCount; i++) {
+            if (committees[i].getCommitteeName().equalsIgnoreCase(committeeName)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public boolean addCommittee(Committee committee) {
-        if (getCommitteeIndex(committee.getCommitteeName())!=-1) {
-            return false;
-        }
-
-        if (this.committeesCount == this.committees.length){
-            Committee[] newCommittees = new Committee[this.committees.length * 2];
-            for (int i = 0; i < this.committeesCount; i++) {
-                newCommittees[i] = this.committees[i];
-            }
-            this.committees = newCommittees;
-        }
-
-        this.committees[this.committeesCount] = committee;
-        this.committeesCount++;
-        return true;
+    // get & set
+    public String getLecturerName() {
+        return lecturerName;
     }
 
-    public boolean removeCommittee(Committee committee) {
-        int index=getCommitteeIndex(committee.getCommitteeName());
-        if(index!=-1){
-            int lastIndex=this.committeesCount -1;
-            this.committees[index]=this.committees[lastIndex];
-            this.committees[lastIndex]=null;
-            this.committeesCount--;
-            return true;
+    public void setLecturerName(String lecturerName) {
+        if (lecturerName != null && !lecturerName.isEmpty() && lecturerName.matches("[a-zA-Z ]+")) {
+            this.lecturerName = lecturerName;
+        } else {
+            throw new IllegalArgumentException("Name can only have letters.");
         }
-        return false;
     }
 
     public String getId() {
@@ -71,18 +87,6 @@ public class Lecturer {
             this.id = id;
         } else {
             throw new IllegalArgumentException("ID cannot exceed 9 characters.");
-        }
-    }
-
-    public String getLecturerName() {
-        return lecturerName;
-    }
-
-    public void setLecturerName(String lecturerName) {
-        if (lecturerName != null && !lecturerName.isEmpty() && lecturerName.matches("[a-zA-Z ]+")) {
-            this.lecturerName = lecturerName;
-        } else {
-            throw new IllegalArgumentException("Name can only have letters.");
         }
     }
 
@@ -114,28 +118,27 @@ public class Lecturer {
         return committees;
     }
 
-    public void setCommittees(Committee[] committees) {
-        this.committees = committees;
+    public int getCommitteesCount() {
+        return committeesCount;
     }
 
+    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+
+    // הדפסה
     @Override
     public String toString() {
-        String committeesPrint = "";
-
-        for (int i = 0; i < this.committeesCount; i++) {
-            committeesPrint = committeesPrint + this.committees[i].getCommitteeName() + ", ";
+        StringBuilder committeesPrint = new StringBuilder();
+        for (int i = 0; i < committeesCount; i++) {
+            committeesPrint.append(committees[i].getCommitteeName()).append(", ");
         }
 
-        if (!committeesPrint.isEmpty()) {
-            committeesPrint = committeesPrint.substring(0, committeesPrint.length() - 2);
-        } else {
-            committeesPrint = "No committees yet.";
-        }
+        String finalCommittees = (committeesPrint.length() > 0) ?
+                committeesPrint.substring(0, committeesPrint.length() - 2) : "No committees yet.";
 
-        return "Lecturer: " + this.lecturerName + " (ID: " + this.id + ")\n" +
-                "Degree: " + this.levelOfDegree + " in " + this.typeOfDegree + "\n" +
-                "Salary: " + this.pay + "\n" +
-                "Department: " + ((this.department != null) ? this.department.getDepartmentName() : "No Department") + "\n" +
-                "Committees: [" + committeesPrint + "]\n";
+        return "Lecturer: " + lecturerName + " (ID: " + id + ")\n" +
+                "Degree: " + levelOfDegree + " in " + typeOfDegree + "\n" +
+                "Salary: " + pay + "\n" +
+                "Department: " + ((department != null) ? department.getDepartmentName() : "No Department") + "\n" +
+                "Committees: [" + finalCommittees + "]\n";
     }
 }

@@ -1,14 +1,47 @@
 public class Department {
+    // תכונות
     private String departmentName;
     private int studentsCount;
-    private int lecturersCount = 0;
     private Lecturer[] lecturers = new Lecturer[1];
+    private int lecturersCount = 0;
 
-    public Department(String departmentName, int studentsCount){
+    // פעולה בונה
+    public Department(String departmentName, int studentsCount) {
         this.departmentName = departmentName;
         this.studentsCount = studentsCount;
     }
 
+    // פעולות
+    public boolean addLecturer(Lecturer newLecturer) {
+        if (getLecturerIndex(newLecturer.getId()) == -1) {
+            if (lecturersCount == lecturers.length) {
+                doubleLecturersArraySize();
+            }
+            lecturers[lecturersCount++] = newLecturer;
+            return true;
+        }
+        return false;
+    }
+
+    // פעולות עזר
+    private void doubleLecturersArraySize() {
+        Lecturer[] newLecturers = new Lecturer[lecturers.length * 2];
+        for (int i = 0; i < lecturersCount; i++) {
+            newLecturers[i] = lecturers[i];
+        }
+        lecturers = newLecturers;
+    }
+
+    public int getLecturerIndex(String lecturerId) {
+        for (int i = 0; i < lecturersCount; i++) {
+            if (lecturers[i].getId().equals(lecturerId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // get & set
     public String getDepartmentName() {
         return departmentName;
     }
@@ -25,48 +58,29 @@ public class Department {
         this.studentsCount = studentsCount;
     }
 
-    public int getLecturersCount() {
-        return lecturersCount;
-    }
-
-    public void setLecturersCount(int lecturersCount) {
-        this.lecturersCount = lecturersCount;
-    }
-
     public Lecturer[] getLecturers() {
         return lecturers;
     }
 
-    public void setLecturers(Lecturer[] lecturers) {
-        this.lecturers = lecturers;
+    public int getLecturersCount() {
+        return lecturersCount;
     }
 
-    private void doubleLecturerArraySize() {
-        Lecturer[] newLecturers = new Lecturer[this.lecturers.length * 2];
-        for (int i = 0; i < this.lecturers.length; i++) {
-            newLecturers[i] = this.lecturers[i];
-        }
-        this.lecturers = newLecturers;
-    }
+    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
 
-    public boolean isValidLecturer(String lecturerId) {
-        for (int i = 0; i < this.lecturersCount; i++) {
-            if (this.lecturers[i].getId().equalsIgnoreCase(lecturerId)) {
-                return true;
-            }
+    //הדפסה
+    @Override
+    public String toString() {
+        StringBuilder lecturersPrint = new StringBuilder();
+        for (int i = 0; i < lecturersCount; i++) {
+            lecturersPrint.append(lecturers[i].getLecturerName()).append(", ");
         }
-        return false;
-    }
 
-    public boolean addLecturer(Lecturer newLecturer) {
-        if (!isValidLecturer(newLecturer.getId())) {
-            if (this.lecturersCount == this.lecturers.length) {
-                doubleLecturerArraySize();
-            }
-            this.lecturers[this.lecturersCount] = newLecturer;
-            this.lecturersCount++;
-            return true;
-        }
-        return false;
+        String finalLecturers = (lecturersPrint.length() > 0) ?
+                lecturersPrint.substring(0, lecturersPrint.length() - 2) : "No lecturers yet.";
+
+        return "Department Name: " + departmentName + "\n" +
+                "Students Count: " + studentsCount + "\n" +
+                "Lecturers: [" + finalLecturers + "]\n";
     }
 }
