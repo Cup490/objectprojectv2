@@ -31,7 +31,7 @@ public static void main(String[] args) {
                 System.out.println("the program has ended");
                 break;
             case 1:
-                System.out.println("What College would you like to add a lecturer to?");
+                System.out.println("What College would you like to add a lecturer to? ");
                 String College1 = s.nextLine();
 
                 System.out.println("Enter lecturer name: ");
@@ -58,6 +58,16 @@ public static void main(String[] args) {
                     System.out.println("Lecturer was not saved");
                 }
             case 2:
+                System.out.println("What College would you like to add a committee to?");
+                String College2 = s.nextLine();
+
+                System.out.println("Please name the committee you want to add");
+                String myCommitte = s.nextLine();
+
+                System.out.println("name a chairperson");
+                String person = s.nextLine();
+                String myChairperson  = person.
+                College myCollege = College2.addCommittee(myCommitte, myChairperson);
 
                 break;
             case 3:
