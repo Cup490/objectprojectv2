@@ -1,14 +1,59 @@
 public class Committee {
     private String committeeName;
-    private Lecturer chairPerson = null;
+    private Lecturer chairman = null;
     private Lecturer[] members = new Lecturer[1];
-    private int logicalSize = 0;
+    private int memberCount = 0;
 
     public Committee(String name) {
         this.committeeName = name;
     }
 
-    public String getName() {
+    public boolean addMember(Lecturer newMember) {
+        if (this.chairman != null && this.chairman.getId().equals(newMember.getId())){
+            return false;
+        }
+        else {
+            for (int i = 0; i < this.memberCount; i++) {
+                if (newMember.getId().equals(this.members[i].getId())) {
+                    return false;
+                }
+            }
+
+            if (this.memberCount < this.members.length) {
+                this.members[this.memberCount] = newMember;
+                this.memberCount++;
+            }
+            else {
+                Lecturer[] newMembers = new Lecturer[this.members.length * 2];
+                for (int i = 0; i < this.memberCount; i++) {
+                    newMembers[i] = this.members[i];
+                }
+                newMembers[this.memberCount] = newMember;
+                this.members = newMembers;
+                this.memberCount++;
+            }
+
+            newMember.addCommittee(this);
+            return true;
+        }
+    }
+
+    public boolean removeMember(Lecturer member) {
+        for (int i = 0; i < this.memberCount; i++) {
+            if (this.members[i].getId().equals(member.getId())) {
+                int lastIndex = this.memberCount - 1;
+                this.members[i] = this.members[lastIndex];
+                this.members[lastIndex] = null;
+                this.memberCount--;
+                member.removeCommittee(this);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public String getCommitteeName() {
         return committeeName;
     }
 
@@ -16,8 +61,8 @@ public class Committee {
         this.committeeName = name;
     }
 
-    public Lecturer getChairPerson() {
-        return chairPerson;
+    public Lecturer getChairman() {
+        return chairman;
     }
 
     public boolean setChairPerson(Lecturer newChairPerson) {
@@ -25,7 +70,8 @@ public class Committee {
             return false;
         } else {
             removeMember(newChairPerson);
-            this.chairPerson = newChairPerson;
+            newChairPerson.addCommittee(this);
+            this.chairman = newChairPerson;
             return true;
         }
     }
@@ -38,58 +84,20 @@ public class Committee {
         this.members = members;
     }
 
-    public int getLogicalSize() {
-        return logicalSize;
+    public int getMemberCount() {
+        return memberCount;
     }
 
-    public void setLogicalSize(int logicalSize) {
-        this.logicalSize = logicalSize;
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
     }
 
-    public boolean addMember(Lecturer newMember) {
-        for (int i = 0; i < this.logicalSize; i++) {
-            if (newMember.equals(this.members[i])) {
-                return false;
-            }
-        }
-
-        if (this.logicalSize < this.members.length) {
-            this.members[this.logicalSize] = newMember;
-            this.logicalSize++;
-        } else {
-            Lecturer[] newMembers = new Lecturer[this.members.length * 2];
-            for (int i = 0; i < this.logicalSize; i++) {
-                newMembers[i] = this.members[i];
-            }
-            newMembers[this.logicalSize] = newMember;
-            this.members = newMembers;
-            this.logicalSize++;
-        }
-
-        newMember.addCommittee(this);
-        return true;
-    }
-
-    public boolean removeMember(Lecturer member) {
-        for (int i = 0; i < this.logicalSize; i++) {
-            if (this.members[i].equals(member)) {
-                int lastIndex = this.logicalSize - 1;
-                this.members[i] = this.members[lastIndex];
-                this.members[lastIndex] = null;
-                this.logicalSize--;
-                member.removeCommittee(this);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    @Override
     public String toString() {
         String membersPrint = "";
 
-        for (int i = 0; i < this.logicalSize; i++) {
-            membersPrint = membersPrint + this.members[i].getName() + ", ";
+        for (int i = 0; i < this.memberCount; i++) {
+            membersPrint = membersPrint + this.members[i].getLecturerName() + ", ";
         }
 
         if (!membersPrint.isEmpty()) {
@@ -99,7 +107,7 @@ public class Committee {
         }
 
         return "Committee Name: " + this.committeeName + "\n" +
-                "Chairperson: " + (this.chairPerson != null ? this.chairPerson.getName() : "None") + "\n" +
+                "Chairperson: " + (this.chairman != null ? this.chairman.getLecturerName() : "None") + "\n" +
                 "Members: " + membersPrint + "\n";
     }
 }
