@@ -176,6 +176,7 @@ public class College {
         return null;
     }
 
+
     private void doubleLecturerArraySize() {
         Lecturer[] newArr = new Lecturer[lecturers.length * 2];
         for (int i = 0; i < lecturersCount; i++) newArr[i] = lecturers[i];

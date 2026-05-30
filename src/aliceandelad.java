@@ -1,4 +1,5 @@
 import java.util.Scanner;
+public class aliceandelad   {
 public static void info(String[] array,int Count) {
     for (int i = 0; i < Count; i++) {
         System.out.println(array[i]);
@@ -7,9 +8,6 @@ public static void info(String[] array,int Count) {
 
 public static void main(String[] args) {
     Scanner s = new Scanner(System.in);
-    String UniName = ("Please Enter the uni's name");
-    System.out.println(UniName);
-    String Uni = s.nextLine();
     String choices = ("Please choose your option\n " +
             "0 - Exit\n " +
             "1 - Add Lecturer to college\n" +
@@ -33,8 +31,43 @@ public static void main(String[] args) {
                 System.out.println("the program has ended");
                 break;
             case 1:
+                System.out.println("What College would you like to add a lecturer to? ");
+                String College1 = s.nextLine();
 
+                System.out.println("Enter lecturer name: ");
+                String inputName = s.nextLine();
+
+                System.out.print("Enter ID: ");
+                String inputId = s.nextLine();
+
+                System.out.print("Enter type of degree: ");
+                String inputTypeOfDegree = s.nextLine();
+
+                System.out.print("Enter pay: ");
+                double inputPay = s.nextDouble();
+                s.nextLine();
+
+                System.out.print("Enter level of degree (e.g., Bachelor's, Masters, Doctor, prof): ");
+                String inputLevelOfDegree = s.nextLine();
+                Lecturer myLecturer = new Lecturer(inputName, inputId, inputTypeOfDegree, inputPay, inputLevelOfDegree);
+                College myCollege = new College(College1);
+                if (myCollege.addLecturer(myLecturer)) {
+                  System.out.println("Lecturer added successfully");
+                }
+                else {
+                    System.out.println("Lecturer was not saved");
+                }
             case 2:
+                System.out.println("What College would you like to add a committee to?");
+                String College2 = s.nextLine();
+
+                System.out.println("Please name the committee you want to add");
+                String myCommitte = s.nextLine();
+
+                System.out.println("name a chairperson");
+                String person = s.nextLine();
+                String myChairperson  = person.
+                College myCollege = College2.addCommittee(myCommitte, myChairperson);
 
                 break;
             case 3:
@@ -61,4 +94,5 @@ public static void main(String[] args) {
         System.out.println(choices);
         answer = s.nextInt();
     }
+}
 }
