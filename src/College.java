@@ -136,6 +136,7 @@ public class College {
         return true;
     }
 
+
     private void doubleLecturerArraySize() {
         Lecturer[] newLecturers = new Lecturer[this.lecturers.length * 2];
         for (int i = 0; i < this.lecturers.length; i++) {
