@@ -22,6 +22,7 @@ public class Committee {
             doubleMembersArraySize();
         }
         members[memberCount++] = newMember;
+        newMember.addCommittee(this);
         return true;
     }
 
@@ -30,6 +31,9 @@ public class Committee {
         if (index != -1) {
             members[index] = members[--memberCount];
             members[memberCount] = null;
+
+            member.removeCommittee(this);
+
             return true;
         }
         return false;
@@ -69,6 +73,7 @@ public class Committee {
     public boolean setChairPerson(Lecturer newChairPerson) {
         if (newChairPerson != null && newChairPerson.isDoctor()) {
             this.chairman = newChairPerson;
+            newChairPerson.addCommittee(this);
             return true;
         }
         return false;

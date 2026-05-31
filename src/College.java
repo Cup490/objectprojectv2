@@ -49,8 +49,8 @@ public class College {
         }
 
         Committee newCommittee = new Committee(committeeName);
+
         newCommittee.setChairPerson(potentialChair);
-        potentialChair.addCommittee(newCommittee);
 
         if (committeesCount == committees.length) {
             doubleCommitteeArraySize();
@@ -78,7 +78,6 @@ public class College {
 
         if (lecturer != null && committee != null) {
             if (committee.addMember(lecturer)) {
-                lecturer.addCommittee(committee);
                 return true;
             }
         }
@@ -91,7 +90,6 @@ public class College {
 
         if (lecturer != null && committee != null) {
             if (committee.removeMember(lecturer)) {
-                lecturer.removeCommittee(committee);
                 return true;
             }
         }
@@ -112,7 +110,6 @@ public class College {
             }
 
             if (committee.setChairPerson(newChair)) {
-                newChair.addCommittee(committee);
                 return true;
             }
         }
