@@ -194,12 +194,6 @@ public class College {
         departments = newArr;
     }
 
-    private void Informationaboutlecturers(Lecturer name) {
-        for (int i = 0; i < lecturersCount; i++) {
-            if (findLecturerByName(name))
-        }
-    }
-
     // get & set
     public String getUniName() {
         return uniName;
