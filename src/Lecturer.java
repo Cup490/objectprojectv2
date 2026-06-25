@@ -22,9 +22,9 @@ public class Lecturer {
     }
 
     // פעולות
-    public boolean isDoctor() {
-        return levelOfDegree == LevelOfDegree.DOCTOR || levelOfDegree == LevelOfDegree.PROF;
-    }
+//    public boolean isDoctor() {
+//        return levelOfDegree == LevelOfDegree.DOCTOR || levelOfDegree == LevelOfDegree.PROF;
+//    }
 
     public boolean addCommittee(Committee committee) {
         if (getCommitteeIndex(committee.getCommitteeName()) != -1) {
