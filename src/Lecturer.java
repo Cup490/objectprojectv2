@@ -22,29 +22,23 @@ public class Lecturer {
     }
 
     // פעולות
-//    public boolean isDoctor() {
-//        return levelOfDegree == LevelOfDegree.DOCTOR || levelOfDegree == LevelOfDegree.PROF;
-//    }
-
-    public boolean addCommittee(Committee committee) {
+    public void addCommittee(Committee committee) throws InvalidActionException {
         if (getCommitteeIndex(committee.getCommitteeName()) != -1) {
-            return false;
+            throw new InvalidActionException("Lecturer is already a member of this committee.");
         }
         if (committeesCount == committees.length) {
             doubleCommitteesArraySize();
         }
         committees[committeesCount++] = committee;
-        return true;
     }
 
-    public boolean removeCommittee(Committee committee) {
+    public void removeCommittee(Committee committee) throws InvalidActionException {
         int index = getCommitteeIndex(committee.getCommitteeName());
-        if (index != -1) {
-            committees[index] = committees[--committeesCount];
-            committees[committeesCount] = null;
-            return true;
+        if (index == -1) {
+            throw new InvalidActionException("Lecturer is not a member of this committee.");
         }
-        return false;
+        committees[index] = committees[--committeesCount];
+        committees[committeesCount] = null;
     }
 
     // פעולות עזר
@@ -131,10 +125,8 @@ public class Lecturer {
         for (int i = 0; i < committeesCount; i++) {
             committeesPrint.append(committees[i].getCommitteeName()).append(", ");
         }
-
         String finalCommittees = (committeesPrint.length() > 0) ?
                 committeesPrint.substring(0, committeesPrint.length() - 2) : "No committees yet.";
-
         return "Lecturer: " + lecturerName + " (ID: " + id + ")\n" +
                 "Degree: " + levelOfDegree + " in " + typeOfDegree + "\n" +
                 "Salary: " + pay + "\n" +

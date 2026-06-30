@@ -12,15 +12,14 @@ public class Department {
     }
 
     // פעולות
-    public boolean addLecturer(Lecturer newLecturer) {
-        if (getLecturerIndex(newLecturer.getId()) == -1) {
-            if (lecturersCount == lecturers.length) {
-                doubleLecturersArraySize();
-            }
-            lecturers[lecturersCount++] = newLecturer;
-            return true;
+    public void addLecturer(Lecturer newLecturer) throws InvalidActionException {
+        if (getLecturerIndex(newLecturer.getId()) != -1) {
+            throw new InvalidActionException(InvalidActionException.ALREADY_IN_DEPARTMENT);
         }
-        return false;
+        if (lecturersCount == lecturers.length) {
+            doubleLecturersArraySize();
+        }
+        lecturers[lecturersCount++] = newLecturer;
     }
 
     // פעולות עזר
@@ -75,10 +74,8 @@ public class Department {
         for (int i = 0; i < lecturersCount; i++) {
             lecturersPrint.append(lecturers[i].getLecturerName()).append(", ");
         }
-
         String finalLecturers = (lecturersPrint.length() > 0) ?
                 lecturersPrint.substring(0, lecturersPrint.length() - 2) : "No lecturers yet.";
-
         return "Department Name: " + departmentName + "\n" +
                 "Students Count: " + studentsCount + "\n" +
                 "Lecturers: [" + finalLecturers + "]\n";

@@ -19,15 +19,14 @@ public class Doctor extends Lecturer {
         return -1;
     }
 
-    public boolean addArticle(String article) {
+    public void addArticle(String article) throws InvalidActionException {
         if (getArticleIndex(article) != -1) {
-            return false;
+            throw new InvalidActionException(InvalidActionException.ARTICLE_ALREADY_EXISTS);
         }
         if (articlesCount == articles.length) {
             doubleArticlesArraySize();
         }
         articles[articlesCount++] = article;
-        return true;
     }
 
     private void doubleArticlesArraySize() {

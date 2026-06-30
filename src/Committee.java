@@ -11,32 +11,28 @@ public class Committee {
     }
 
     // פעולות
-    public boolean addMember(Lecturer newMember) {
+    public void addMember(Lecturer newMember) throws InvalidActionException {
         if (chairman != null && chairman.getId().equals(newMember.getId())) {
-            return false;
+            throw new InvalidActionException(InvalidActionException.CHAIR_CANNOT_BE_MEMBER);
         }
         if (getMemberIndex(newMember.getId()) != -1) {
-            return false;
+            throw new InvalidActionException(InvalidActionException.ALREADY_IN_COMMITTEE);
         }
         if (memberCount == members.length) {
             doubleMembersArraySize();
         }
         members[memberCount++] = newMember;
         newMember.addCommittee(this);
-        return true;
     }
 
-    public boolean removeMember(Lecturer member) {
+    public void removeMember(Lecturer member) throws InvalidActionException {
         int index = getMemberIndex(member.getId());
-        if (index != -1) {
-            members[index] = members[--memberCount];
-            members[memberCount] = null;
-
-            member.removeCommittee(this);
-
-            return true;
+        if (index == -1) {
+            throw new InvalidActionException(InvalidActionException.NOT_IN_COMMITTEE);
         }
-        return false;
+        members[index] = members[--memberCount];
+        members[memberCount] = null;
+        member.removeCommittee(this);
     }
 
     // פעולות עזר
@@ -70,13 +66,12 @@ public class Committee {
         return chairman;
     }
 
-    public boolean setChairPerson(Lecturer newChairPerson) {
-        if (newChairPerson != null && newChairPerson.isDoctor()) {
-            this.chairman = newChairPerson;
-            newChairPerson.addCommittee(this);
-            return true;
+    public void setChairPerson(Lecturer newChairPerson) throws InvalidActionException {
+        if (newChairPerson == null || !(newChairPerson instanceof Doctor)) {
+            throw new InvalidActionException(InvalidActionException.INVALID_CHAIRPERSON);
         }
-        return false;
+        this.chairman = newChairPerson;
+        newChairPerson.addCommittee(this);
     }
 
     public Lecturer[] getMembers() {
@@ -96,10 +91,8 @@ public class Committee {
         for (int i = 0; i < memberCount; i++) {
             membersPrint.append(members[i].getLecturerName()).append(", ");
         }
-
         String finalMembers = (membersPrint.length() > 0) ?
                 membersPrint.substring(0, membersPrint.length() - 2) : "No members yet.";
-
         return "Committee Name: " + committeeName + "\n" +
                 "Chairperson: " + (chairman != null ? chairman.getLecturerName() : "None") + "\n" +
                 "Members: [" + finalMembers + "]\n";

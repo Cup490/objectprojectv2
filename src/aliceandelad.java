@@ -176,7 +176,7 @@ public class aliceandelad {
                         System.out.println("Lecturer was successfully added to the department.");
                     } else {
                         System.out.println("Failed to add lecturer to the department.");
-                        System.out.println("(Check if the ID or Department name are correct, or if the lecturer is already in a department)");
+                        System.out.println("(Check if the ID or Department name are correct, or if the lecturer is already in a department.)");
                     }
                     break;
                 case 8:
