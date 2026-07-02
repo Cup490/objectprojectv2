@@ -13,9 +13,9 @@ public class Doctor extends Lecturer implements Comparable<Doctor> {
     }
 
     // פעולות
-    public void addArticle(String article) throws InvalidActionException {
+    public void addArticle(String article) throws ArticleAlreadyExistsException {
         if (getArticleIndex(article) != -1) {
-            throw new InvalidActionException(InvalidActionException.ARTICLE_ALREADY_EXISTS);
+            throw new ArticleAlreadyExistsException("This article is already in the list.");
         }
         if (articlesCount == articles.length) {
             doubleArticlesArraySize();

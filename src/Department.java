@@ -12,9 +12,9 @@ public class Department {
     }
 
     // פעולות
-    public void addLecturer(Lecturer newLecturer) throws InvalidActionException {
+    public void addLecturer(Lecturer newLecturer) throws AlreadyInDepartmentException {
         if (getLecturerIndex(newLecturer.getId()) != -1) {
-            throw new InvalidActionException(InvalidActionException.ALREADY_IN_DEPARTMENT);
+            throw new AlreadyInDepartmentException("This lecturer is already assigned to a department.");
         }
         if (lecturersCount == lecturers.length) {
             doubleLecturersArraySize();

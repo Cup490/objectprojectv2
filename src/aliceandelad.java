@@ -78,15 +78,50 @@ public class aliceandelad {
                     double inputPay = s.nextDouble();
                     s.nextLine();
 
-                    System.out.print("Enter level of degree (e.g., BACHELORS, MASTERS, DOCTOR, PROF): ");
+                    System.out.print("Enter level of degree (BACHELORS, MASTERS, DOCTOR, PROF): ");
                     String inputLevelOfDegree = s.nextLine();
+                    String levelUpper = inputLevelOfDegree.trim().toUpperCase();
 
-                    Lecturer myLecturer = new Lecturer(inputName, inputId, inputTypeOfDegree, inputPay, inputLevelOfDegree);
+                    while (!levelUpper.equals("BACHELORS") && !levelUpper.equals("MASTERS")
+                            && !levelUpper.equals("DOCTOR") && !levelUpper.equals("PROF")) {
+                        System.out.print("Invalid degree level. Please enter one of BACHELORS, MASTERS, DOCTOR, PROF: ");
+                        inputLevelOfDegree = s.nextLine();
+                        levelUpper = inputLevelOfDegree.trim().toUpperCase();
+                    }
+
+                    // Build the correct concrete type so that Doctor/Professor-only features
+                    // (chairing a committee, article tracking, article-count comparisons)
+                    // are actually reachable from the menu.
+                    Lecturer myLecturer;
+                    if (levelUpper.equals("PROF")) {
+                        System.out.print("Enter the granting body: ");
+                        String grantingBody = s.nextLine();
+                        myLecturer = new Professor(inputName, inputId, inputTypeOfDegree, inputPay, grantingBody);
+                    } else if (levelUpper.equals("DOCTOR")) {
+                        myLecturer = new Doctor(inputName, inputId, inputTypeOfDegree, inputPay);
+                    } else {
+                        myLecturer = new Lecturer(inputName, inputId, inputTypeOfDegree, inputPay, inputLevelOfDegree);
+                    }
 
                     try {
                         myCollege.addLecturer(myLecturer);
                         System.out.println("Lecturer added successfully");
-                    } catch (InvalidActionException e) {
+
+                        if (myLecturer instanceof Doctor) {
+                            System.out.print("How many articles would you like to add? ");
+                            int articleCount = s.nextInt();
+                            s.nextLine();
+                            for (int i = 0; i < articleCount; i++) {
+                                System.out.print("Enter article title #" + (i + 1) + ": ");
+                                String articleTitle = s.nextLine();
+                                try {
+                                    ((Doctor) myLecturer).addArticle(articleTitle);
+                                } catch (ArticleAlreadyExistsException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            }
+                        }
+                    } catch (LecturerAlreadyExistsException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -106,7 +141,7 @@ public class aliceandelad {
                     try {
                         myCollege.addCommittee(committeeName, chairId);
                         System.out.println("Committee added successfully with the designated chairperson!");
-                    } catch (InvalidActionException e) {
+                    } catch (CommitteeAlreadyExistsException | InvalidChairpersonException | EntityNotFoundException | AlreadyMemberException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -121,7 +156,7 @@ public class aliceandelad {
                     try {
                         myCollege.addLecturerToCommittee(memberIdToAdd, commName3);
                         System.out.println("The lecturer was successfully added as a member of the committee!");
-                    } catch (InvalidActionException e) {
+                    } catch (EntityNotFoundException | ChairCannotBeMemberException | AlreadyMemberException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -136,7 +171,7 @@ public class aliceandelad {
                     try {
                         myCollege.updateChairman(newChairId, commName4);
                         System.out.println("The committee's chairperson was successfully updated!");
-                    } catch (InvalidActionException e) {
+                    } catch (EntityNotFoundException | InvalidChairpersonException | NotInCommitteeException | AlreadyMemberException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -151,7 +186,7 @@ public class aliceandelad {
                     try {
                         myCollege.removeMemberFromCommittee(memberIdToRemove, commName5);
                         System.out.println("The member was successfully removed from the committee.");
-                    } catch (InvalidActionException e) {
+                    } catch (EntityNotFoundException | NotInCommitteeException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -174,7 +209,7 @@ public class aliceandelad {
                     try {
                         myCollege.addDepartment(newDepartment);
                         System.out.println("Department added successfully to the college!");
-                    } catch (InvalidActionException e) {
+                    } catch (DepartmentAlreadyExistsException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -189,7 +224,7 @@ public class aliceandelad {
                     try {
                         myCollege.addLecturerToDepartment(lecIdDept, deptName);
                         System.out.println("Lecturer was successfully added to the department.");
-                    } catch (InvalidActionException e) {
+                    } catch (EntityNotFoundException | AlreadyInDepartmentException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -281,7 +316,7 @@ public class aliceandelad {
                         System.out.println("Error: One or both committees were not found.");
                     }
                     break;
-                    
+
                 case 14:
                     System.out.print("Enter the name of the Committee you want to clone: ");
                     String targetClone = s.nextLine();
@@ -292,7 +327,7 @@ public class aliceandelad {
                             Committee clonedCommittee = original.cloneCommittee();
                             myCollege.addCommittee(clonedCommittee);
                             System.out.println("Committee successfully cloned! New name: " + clonedCommittee.getCommitteeName());
-                        } catch (InvalidActionException e) {
+                        } catch (CommitteeAlreadyExistsException | InvalidChairpersonException | AlreadyMemberException | ChairCannotBeMemberException e) {
                             System.out.println(e.getMessage());
                         }
                     } else {

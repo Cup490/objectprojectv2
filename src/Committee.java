@@ -11,12 +11,12 @@ public class Committee implements Comparable<Committee> {
     }
 
     // פעולות
-    public void addMember(Lecturer newMember) throws InvalidActionException {
+    public void addMember(Lecturer newMember) throws ChairCannotBeMemberException, AlreadyMemberException {
         if (chairman != null && chairman.getId().equals(newMember.getId())) {
-            throw new InvalidActionException(InvalidActionException.CHAIR_CANNOT_BE_MEMBER);
+            throw new ChairCannotBeMemberException("The chairman cannot be added as a regular member.");
         }
         if (getMemberIndex(newMember.getId()) != -1) {
-            throw new InvalidActionException(InvalidActionException.ALREADY_IN_COMMITTEE);
+            throw new AlreadyMemberException("This lecturer is already a member of the committee.");
         }
         if (memberCount == members.length) {
             doubleMembersArraySize();
@@ -25,25 +25,21 @@ public class Committee implements Comparable<Committee> {
         newMember.addCommittee(this);
     }
 
-    public void removeMember(Lecturer member) throws InvalidActionException {
+    public void removeMember(Lecturer member) throws NotInCommitteeException {
         int index = getMemberIndex(member.getId());
         if (index == -1) {
-            throw new InvalidActionException(InvalidActionException.NOT_IN_COMMITTEE);
+            throw new NotInCommitteeException("This lecturer is not a member of the committee.");
         }
         members[index] = members[--memberCount];
         members[memberCount] = null;
         member.removeCommittee(this);
     }
 
-    public int compareByMemberCount(Committee other) {
-        return Integer.compare(this.memberCount, other.getMemberCount());
-    }
-
     public int compareByTotalArticles(Committee other) {
         return Integer.compare(this.getTotalArticles(), other.getTotalArticles());
     }
 
-    public Committee cloneCommittee() throws InvalidActionException {
+    public Committee cloneCommittee() throws InvalidChairpersonException, AlreadyMemberException, ChairCannotBeMemberException {
         Committee cloned = new Committee("new-" + this.committeeName);
         if (this.chairman != null && this.chairman instanceof Doctor) {
             cloned.setChairPerson((Doctor) this.chairman);
@@ -111,9 +107,9 @@ public class Committee implements Comparable<Committee> {
         return chairman;
     }
 
-    public void setChairPerson(Doctor newChairPerson) throws InvalidActionException {
+    public void setChairPerson(Doctor newChairPerson) throws InvalidChairpersonException, AlreadyMemberException {
         if (newChairPerson == null) {
-            throw new InvalidActionException("Chairperson cannot be null.");
+            throw new InvalidChairpersonException("Chairperson cannot be null.");
         }
         this.chairman = newChairPerson;
         newChairPerson.addCommittee(this);

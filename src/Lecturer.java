@@ -22,9 +22,9 @@ public class Lecturer {
     }
 
     // פעולות
-    public void addCommittee(Committee committee) throws InvalidActionException {
+    public void addCommittee(Committee committee) throws AlreadyMemberException {
         if (getCommitteeIndex(committee.getCommitteeName()) != -1) {
-            throw new InvalidActionException("Lecturer is already a member of this committee.");
+            throw new AlreadyMemberException("Lecturer is already a member of this committee.");
         }
         if (committeesCount == committees.length) {
             doubleCommitteesArraySize();
@@ -32,10 +32,10 @@ public class Lecturer {
         committees[committeesCount++] = committee;
     }
 
-    public void removeCommittee(Committee committee) throws InvalidActionException {
+    public void removeCommittee(Committee committee) throws NotInCommitteeException {
         int index = getCommitteeIndex(committee.getCommitteeName());
         if (index == -1) {
-            throw new InvalidActionException("Lecturer is not a member of this committee.");
+            throw new NotInCommitteeException("Lecturer is not a member of this committee.");
         }
         committees[index] = committees[--committeesCount];
         committees[committeesCount] = null;

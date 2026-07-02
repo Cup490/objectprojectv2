@@ -14,10 +14,10 @@ public class College {
     }
 
     // פעולות
-    public void addLecturer(Lecturer newLecturer) throws InvalidActionException {
+    public void addLecturer(Lecturer newLecturer) throws LecturerAlreadyExistsException {
         if (findLecturerByName(newLecturer.getLecturerName()) != null ||
                 findLecturerById(newLecturer.getId()) != null) {
-            throw new InvalidActionException("A lecturer with this name or ID already exists.");
+            throw new LecturerAlreadyExistsException("A lecturer with this name or ID already exists.");
         }
         if (lecturersCount == lecturers.length) {
             doubleLecturerArraySize();
@@ -25,9 +25,9 @@ public class College {
         lecturers[lecturersCount++] = newLecturer;
     }
 
-    public void addDepartment(Department department) throws InvalidActionException {
+    public void addDepartment(Department department) throws DepartmentAlreadyExistsException {
         if (findDepartmentByName(department.getDepartmentName()) != null) {
-            throw new InvalidActionException("A department with this name already exists.");
+            throw new DepartmentAlreadyExistsException("A department with this name already exists.");
         }
         if (departmentsCount == departments.length) {
             doubleDepartmentArraySize();
@@ -35,13 +35,16 @@ public class College {
         departments[departmentsCount++] = department;
     }
 
-    public void addCommittee(String committeeName, String chairId) throws InvalidActionException {
+    public void addCommittee(String committeeName, String chairId) throws CommitteeAlreadyExistsException, InvalidChairpersonException, EntityNotFoundException, AlreadyMemberException {
         if (findCommitteeByName(committeeName) != null) {
-            throw new InvalidActionException("A committee with this name already exists.");
+            throw new CommitteeAlreadyExistsException("A committee with this name already exists.");
         }
         Lecturer potentialChair = findLecturerById(chairId);
-        if (potentialChair == null || !(potentialChair instanceof Doctor)) {
-            throw new InvalidActionException("The chairperson must be at least a Doctor or Professor.");
+        if (potentialChair == null) {
+            throw new EntityNotFoundException("Lecturer ID not found.");
+        }
+        if (!(potentialChair instanceof Doctor)) {
+            throw new InvalidChairpersonException("The chairperson must be at least a Doctor or Professor.");
         }
         Committee newCommittee = new Committee(committeeName);
         newCommittee.setChairPerson((Doctor) potentialChair);
@@ -50,10 +53,10 @@ public class College {
         }
         committees[committeesCount++] = newCommittee;
     }
-    
-    public void addCommittee(Committee newCommittee) throws InvalidActionException {
+
+    public void addCommittee(Committee newCommittee) throws CommitteeAlreadyExistsException {
         if (findCommitteeByName(newCommittee.getCommitteeName()) != null) {
-            throw new InvalidActionException("A committee with this name already exists.");
+            throw new CommitteeAlreadyExistsException("A committee with this name already exists.");
         }
         if (committeesCount == committees.length) {
             doubleCommitteeArraySize();
@@ -61,45 +64,52 @@ public class College {
         committees[committeesCount++] = newCommittee;
     }
 
-    public void addLecturerToDepartment(String lecturerId, String departmentName) throws InvalidActionException {
+    public void addLecturerToDepartment(String lecturerId, String departmentName) throws EntityNotFoundException, AlreadyInDepartmentException {
         Lecturer lecturer = findLecturerById(lecturerId);
         Department department = findDepartmentByName(departmentName);
-        if (lecturer == null || department == null || lecturer.getDepartment() != null) {
-            throw new InvalidActionException("ID or department name are incorrect or doesn't exist, or lecturer is already in a department.");
+        if (lecturer == null || department == null) {
+            throw new EntityNotFoundException("ID or department name does not exist.");
+        }
+        if (lecturer.getDepartment() != null) {
+            throw new AlreadyInDepartmentException("Lecturer is already in a department.");
         }
         department.addLecturer(lecturer);
         lecturer.setDepartment(department);
     }
 
-    public void addLecturerToCommittee(String lecturerId, String committeeName) throws InvalidActionException {
+    public void addLecturerToCommittee(String lecturerId, String committeeName) throws EntityNotFoundException, ChairCannotBeMemberException, AlreadyMemberException {
         Lecturer lecturer = findLecturerById(lecturerId);
         Committee committee = findCommitteeByName(committeeName);
         if (lecturer == null || committee == null) {
-            throw new InvalidActionException("Lecturer or committee name are incorrect or doesn't exist");
+            throw new EntityNotFoundException("Lecturer or committee name does not exist.");
         }
         committee.addMember(lecturer);
     }
 
-    public void removeMemberFromCommittee(String lecturerId, String committeeName) throws InvalidActionException {
+    public void removeMemberFromCommittee(String lecturerId, String committeeName) throws EntityNotFoundException, NotInCommitteeException {
         Lecturer lecturer = findLecturerById(lecturerId);
         Committee committee = findCommitteeByName(committeeName);
         if (lecturer == null || committee == null) {
-            throw new InvalidActionException("Lecturer or committee name are incorrect or doesn't exist");
+            throw new EntityNotFoundException("Lecturer or committee name does not exist.");
         }
         committee.removeMember(lecturer);
     }
 
-    public void updateChairman(String lecturerId, String committeeName) throws InvalidActionException {
+    public void updateChairman(String lecturerId, String committeeName) throws EntityNotFoundException, InvalidChairpersonException, NotInCommitteeException, AlreadyMemberException {
         Lecturer newChair = findLecturerById(lecturerId);
         Committee committee = findCommitteeByName(committeeName);
-        if (newChair == null || committee == null || !(newChair instanceof Doctor)) {
-            throw new InvalidActionException("Lecturer or committee name are incorrect/missing, or lecturer is not a Doctor.");
+        if (newChair == null || committee == null) {
+            throw new EntityNotFoundException("Lecturer or committee name does not exist.");
         }
+        if (!(newChair instanceof Doctor)) {
+            throw new InvalidChairpersonException("The lecturer is not a Doctor.");
+        }
+        // Per spec: if the requested lecturer is already a regular member of the committee,
+        // this must throw an exception rather than silently promoting them. Committee.setChairPerson
+        // (via Lecturer.addCommittee) naturally throws AlreadyMemberException in that case, as long
+        // as we don't remove their membership first.
         if (committee.getChairman() != null) {
             committee.getChairman().removeCommittee(committee);
-        }
-        if (committee.getMemberIndex(lecturerId) != -1) {
-            committee.removeMember(newChair);
         }
         committee.setChairPerson((Doctor) newChair);
     }
