@@ -22,6 +22,14 @@ public class Department {
         lecturers[lecturersCount++] = newLecturer;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Department)) return false;
+        Department other = (Department) obj;
+        return this.departmentName.equalsIgnoreCase(other.getDepartmentName());
+    }
+
     // פעולות עזר
     private void doubleLecturersArraySize() {
         Lecturer[] newLecturers = new Lecturer[lecturers.length * 2];
@@ -66,6 +74,7 @@ public class Department {
     }
 
     // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     //הדפסה
     @Override

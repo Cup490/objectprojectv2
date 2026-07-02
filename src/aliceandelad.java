@@ -26,11 +26,14 @@ public class aliceandelad {
                 "4 - update a committee's chairperson\n" +
                 "5 - remove a member from the committee\n" +
                 "6 - add a study department\n" +
-                "7 - add lecturer to department\n" + // תוקן מ-committee ל-department
+                "7 - add lecturer to department\n" +
                 "8 - avg pay of all the lecturers in the college\n" +
-                "9 - avg pay of the lecturers in a specific department\n" + // תוקן מ-committee ל-department
+                "9 - avg pay of the lecturers in a specific department\n" +
                 "10 -show the full information about every lecturer\n" +
-                "11 -show the full information about every committee"
+                "11 -show the full information about every committee\n" +
+                "12 - Compare Doctors/Professors by articles\n" +
+                "13 - Compare two Committees\n" +
+                "14 - Clone a Committee"
         );
         College myCollege = new College(College1);
         System.out.println(choices);
@@ -42,6 +45,7 @@ public class aliceandelad {
                 case 0:
                     System.out.println("the program has ended");
                     break;
+
                 case 1:
                     System.out.println("Enter lecturer name: ");
                     String inputName = s.nextLine();
@@ -79,12 +83,14 @@ public class aliceandelad {
 
                     Lecturer myLecturer = new Lecturer(inputName, inputId, inputTypeOfDegree, inputPay, inputLevelOfDegree);
 
-                    if (myCollege.addLecturer(myLecturer)) {
+                    try {
+                        myCollege.addLecturer(myLecturer);
                         System.out.println("Lecturer added successfully");
-                    } else {
-                        System.out.println("Error saving lecturer.");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+
                 case 2:
                     System.out.print("Enter the name of the committee you want to add: ");
                     String committeeName = s.nextLine();
@@ -96,13 +102,15 @@ public class aliceandelad {
 
                     System.out.print("Enter the Chairperson's ID (Must be a Doctor/Prof): ");
                     String chairId = s.nextLine();
-                    if (myCollege.addCommittee(committeeName, chairId)) {
+
+                    try {
+                        myCollege.addCommittee(committeeName, chairId);
                         System.out.println("Committee added successfully with the designated chairperson!");
-                    } else {
-                        System.out.println("Failed to add committee.");
-                        System.out.println("(Make sure the Lecturer ID exists and that their degree level is DOCTOR or PROF)");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+
                 case 3:
                     System.out.print("Enter the Committee Name: ");
                     String commName3 = s.nextLine();
@@ -110,26 +118,29 @@ public class aliceandelad {
                     System.out.print("Enter the Lecturer's ID to add as a member: ");
                     String memberIdToAdd = s.nextLine();
 
-                    if (myCollege.addLecturerToCommittee(memberIdToAdd, commName3)) {
+                    try {
+                        myCollege.addLecturerToCommittee(memberIdToAdd, commName3);
                         System.out.println("The lecturer was successfully added as a member of the committee!");
-                    } else {
-                        System.out.println("Failed to add member to the committee.");
-                        System.out.println("(Make sure the committee exists, the lecturer ID exists, they aren't already a member, and they aren't the chairperson)");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+
                 case 4:
                     System.out.print("Enter the Committee Name: ");
                     String commName4 = s.nextLine();
 
                     System.out.print("Enter the new Chairperson's ID (Must be a Doctor/Prof): ");
                     String newChairId = s.nextLine();
-                    if (myCollege.updateChairman(newChairId, commName4)) {
+
+                    try {
+                        myCollege.updateChairman(newChairId, commName4);
                         System.out.println("The committee's chairperson was successfully updated!");
-                    } else {
-                        System.out.println("Failed to update chairperson.");
-                        System.out.println("(Make sure the committee exists, the lecturer ID exists, and that they are a DOCTOR or PROF)");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+
                 case 5:
                     System.out.print("Enter the Committee Name: ");
                     String commName5 = s.nextLine();
@@ -137,11 +148,11 @@ public class aliceandelad {
                     System.out.print("Enter the ID of the member you want to remove: ");
                     String memberIdToRemove = s.nextLine();
 
-                    if (myCollege.removeMemberFromCommittee(memberIdToRemove, commName5)) {
+                    try {
+                        myCollege.removeMemberFromCommittee(memberIdToRemove, commName5);
                         System.out.println("The member was successfully removed from the committee.");
-                    } else {
-                        System.out.println("Failed to remove member.");
-                        System.out.println("(Make sure the committee exists and that this lecturer is actually a member in it)");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
 
@@ -159,10 +170,12 @@ public class aliceandelad {
                     s.nextLine();
 
                     Department newDepartment = new Department(deptNameInput, studentsCount);
-                    if (myCollege.addDepartment(newDepartment)) {
+
+                    try {
+                        myCollege.addDepartment(newDepartment);
                         System.out.println("Department added successfully to the college!");
-                    } else {
-                        System.out.println("Failed to save the department.");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
 
@@ -172,19 +185,22 @@ public class aliceandelad {
 
                     System.out.print("Enter Department Name: ");
                     String deptName = s.nextLine();
-                    if (myCollege.addLecturerToDepartment(lecIdDept, deptName)) {
+
+                    try {
+                        myCollege.addLecturerToDepartment(lecIdDept, deptName);
                         System.out.println("Lecturer was successfully added to the department.");
-                    } else {
-                        System.out.println("Failed to add lecturer to the department.");
-                        System.out.println("(Check if the ID or Department name are correct, or if the lecturer is already in a department.)");
+                    } catch (InvalidActionException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+
                 case 8:
                     double globalAverage = myCollege.getAveragePay();
 
                     System.out.println("--- College Salary Statistics ---");
                     System.out.printf("The average salary of all lecturers is: %.2f\n", globalAverage);
                     break;
+
                 case 9:
                     System.out.print("Enter the Department Name: ");
                     String targetDept = s.nextLine();
@@ -198,13 +214,90 @@ public class aliceandelad {
                         System.out.printf("The average salary in '%s' department is: %.2f\n", targetDept, deptAverage);
                     }
                     break;
+
                 case 10:
                     System.out.println("--- All Lecturers ---");
                     System.out.println(myCollege.printLecturers());
                     break;
+
                 case 11:
                     System.out.println("--- All Committees ---");
                     System.out.println(myCollege.printCommittees());
+                    break;
+
+                case 12:
+                    System.out.print("Enter the ID of the first Doctor/Professor: ");
+                    String docId1 = s.nextLine();
+                    System.out.print("Enter the ID of the second Doctor/Professor: ");
+                    String docId2 = s.nextLine();
+
+                    Lecturer l1 = myCollege.findLecturerById(docId1);
+                    Lecturer l2 = myCollege.findLecturerById(docId2);
+
+                    if (l1 instanceof Doctor && l2 instanceof Doctor) {
+                        Doctor d1 = (Doctor) l1;
+                        Doctor d2 = (Doctor) l2;
+                        int cmp = d1.compareTo(d2);
+                        if (cmp > 0) {
+                            System.out.println(d1.getLecturerName() + " has more articles.");
+                        } else if (cmp < 0) {
+                            System.out.println(d2.getLecturerName() + " has more articles.");
+                        } else {
+                            System.out.println("Both have the exact same number of articles.");
+                        }
+                    } else {
+                        System.out.println("Error: One or both of the IDs do not belong to a Doctor/Professor, or they do not exist.");
+                    }
+                    break;
+
+                case 13:
+                    System.out.print("Enter the first Committee Name: ");
+                    String cName1 = s.nextLine();
+                    System.out.print("Enter the second Committee Name: ");
+                    String cName2 = s.nextLine();
+
+                    Committee c1 = myCollege.findCommitteeByName(cName1);
+                    Committee c2 = myCollege.findCommitteeByName(cName2);
+
+                    if (c1 != null && c2 != null) {
+                        System.out.println("Compare by:\n1 - Number of members\n2 - Total articles written by members");
+                        int criteria = s.nextInt();
+                        s.nextLine();
+
+                        if (criteria == 1) {
+                            int res = c1.compareTo(c2);
+                            if (res > 0) System.out.println(c1.getCommitteeName() + " has more members.");
+                            else if (res < 0) System.out.println(c2.getCommitteeName() + " has more members.");
+                            else System.out.println("Both committees have the same number of members.");
+                        } else if (criteria == 2) {
+                            int res = c1.compareByTotalArticles(c2);
+                            if (res > 0) System.out.println(c1.getCommitteeName() + " members have more total articles.");
+                            else if (res < 0) System.out.println(c2.getCommitteeName() + " members have more total articles.");
+                            else System.out.println("Both committees have the same number of total articles.");
+                        } else {
+                            System.out.println("Invalid comparison choice.");
+                        }
+                    } else {
+                        System.out.println("Error: One or both committees were not found.");
+                    }
+                    break;
+                    
+                case 14:
+                    System.out.print("Enter the name of the Committee you want to clone: ");
+                    String targetClone = s.nextLine();
+                    Committee original = myCollege.findCommitteeByName(targetClone);
+
+                    if (original != null) {
+                        try {
+                            Committee clonedCommittee = original.cloneCommittee();
+                            myCollege.addCommittee(clonedCommittee);
+                            System.out.println("Committee successfully cloned! New name: " + clonedCommittee.getCommitteeName());
+                        } catch (InvalidActionException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Error: Committee not found.");
+                    }
                     break;
 
                 default:

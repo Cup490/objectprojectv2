@@ -41,6 +41,14 @@ public class Lecturer {
         committees[committeesCount] = null;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Lecturer)) return false;
+        Lecturer other = (Lecturer) obj;
+        return this.id.equals(other.getId());
+    }
+
     // פעולות עזר
     private void doubleCommitteesArraySize() {
         Committee[] newCommittees = new Committee[committees.length * 2];
@@ -117,6 +125,7 @@ public class Lecturer {
     }
 
     // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     // הדפסה
     @Override

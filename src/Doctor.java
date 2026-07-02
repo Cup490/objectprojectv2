@@ -1,7 +1,9 @@
-public class Doctor extends Lecturer {
+public class Doctor extends Lecturer implements Comparable<Doctor> {
+    // תכונות
     private String[] articles=new String[1];
     private int articlesCount=0;
 
+    // פעולה בונה
     public Doctor(String lecturerName, String id, String typeOfDegree, double pay){
         super(lecturerName, id, typeOfDegree, pay, "DOCTOR");
     }
@@ -10,15 +12,7 @@ public class Doctor extends Lecturer {
         super(lecturerName, id, typeOfDegree, pay, levelOfDegree);
     }
 
-    private int getArticleIndex(String articleName) {
-        for (int i = 0; i < articlesCount; i++) {
-            if (articles[i].equalsIgnoreCase(articleName)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
+    // פעולות
     public void addArticle(String article) throws InvalidActionException {
         if (getArticleIndex(article) != -1) {
             throw new InvalidActionException(InvalidActionException.ARTICLE_ALREADY_EXISTS);
@@ -29,6 +23,35 @@ public class Doctor extends Lecturer {
         articles[articlesCount++] = article;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) return false;
+        if (!(obj instanceof Doctor)) return false;
+        Doctor other = (Doctor) obj;
+        if (this.articlesCount != other.articlesCount) return false;
+        for (int i = 0; i < this.articlesCount; i++) {
+            if (!this.articles[i].equalsIgnoreCase(other.articles[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int compareTo(Doctor other) {
+        return Integer.compare(this.articlesCount, other.getArticlesCount());
+    }
+
+    // פעולות עזר
+    private int getArticleIndex(String articleName) {
+        for (int i = 0; i < articlesCount; i++) {
+            if (articles[i].equalsIgnoreCase(articleName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void doubleArticlesArraySize() {
         String[] newArticles = new String[articles.length * 2];
         for (int i = 0; i < articlesCount; i++) {
@@ -37,14 +60,19 @@ public class Doctor extends Lecturer {
         articles = newArticles;
     }
 
+    // get & set
     public String[] getArticles() {
         return articles;
     }
 
-    public void setArticles(String[] articles) {
-        this.articles = articles;
+    public int getArticlesCount(){
+        return articlesCount;
     }
 
+    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
+
+    // הדפסה
     @Override
     public String toString() {
         StringBuilder articlesPrint = new StringBuilder();

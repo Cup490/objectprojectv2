@@ -44,7 +44,17 @@ public class College {
             throw new InvalidActionException("The chairperson must be at least a Doctor or Professor.");
         }
         Committee newCommittee = new Committee(committeeName);
-        newCommittee.setChairPerson(potentialChair);
+        newCommittee.setChairPerson((Doctor) potentialChair);
+        if (committeesCount == committees.length) {
+            doubleCommitteeArraySize();
+        }
+        committees[committeesCount++] = newCommittee;
+    }
+    
+    public void addCommittee(Committee newCommittee) throws InvalidActionException {
+        if (findCommitteeByName(newCommittee.getCommitteeName()) != null) {
+            throw new InvalidActionException("A committee with this name already exists.");
+        }
         if (committeesCount == committees.length) {
             doubleCommitteeArraySize();
         }
@@ -91,7 +101,7 @@ public class College {
         if (committee.getMemberIndex(lecturerId) != -1) {
             committee.removeMember(newChair);
         }
-        committee.setChairPerson(newChair);
+        committee.setChairPerson((Doctor) newChair);
     }
 
     public double getAveragePay() {
@@ -111,6 +121,14 @@ public class College {
             sum += department.getLecturers()[i].getPay();
         }
         return sum / department.getLecturersCount();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof College)) return false;
+        College other = (College) obj;
+        return this.uniName.equalsIgnoreCase(other.getUniName());
     }
 
     // פעולות עזר
@@ -178,8 +196,19 @@ public class College {
     }
 
     // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     // הדפסות
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("College Name: ").append(uniName).append("\n");
+        sb.append("Number of Departments: ").append(departmentsCount).append("\n");
+        sb.append("=== Lecturers Breakdown ===\n").append(printLecturers()).append("\n");
+        sb.append("=== Committees Breakdown ===\n").append(printCommittees());
+        return sb.toString();
+    }
+
     public String printLecturers() {
         if (lecturersCount == 0) return "No lecturers yet.";
         StringBuilder print = new StringBuilder();

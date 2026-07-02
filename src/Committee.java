@@ -1,4 +1,4 @@
-public class Committee {
+public class Committee implements Comparable<Committee> {
     // תכונות
     private String committeeName;
     private Lecturer chairman = null;
@@ -35,6 +35,38 @@ public class Committee {
         member.removeCommittee(this);
     }
 
+    public int compareByMemberCount(Committee other) {
+        return Integer.compare(this.memberCount, other.getMemberCount());
+    }
+
+    public int compareByTotalArticles(Committee other) {
+        return Integer.compare(this.getTotalArticles(), other.getTotalArticles());
+    }
+
+    public Committee cloneCommittee() throws InvalidActionException {
+        Committee cloned = new Committee("new-" + this.committeeName);
+        if (this.chairman != null && this.chairman instanceof Doctor) {
+            cloned.setChairPerson((Doctor) this.chairman);
+        }
+        for (int i = 0; i < this.memberCount; i++) {
+            cloned.addMember(this.members[i]);
+        }
+        return cloned;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Committee)) return false;
+        Committee other = (Committee) obj;
+        return this.committeeName.equalsIgnoreCase(other.getCommitteeName());
+    }
+
+    @Override
+    public int compareTo(Committee other) {
+        return Integer.compare(this.memberCount, other.getMemberCount());
+    }
+
     // פעולות עזר
     private void doubleMembersArraySize() {
         Lecturer[] newMembers = new Lecturer[members.length * 2];
@@ -53,6 +85,19 @@ public class Committee {
         return -1;
     }
 
+    public int getTotalArticles() {
+        int total = 0;
+        if (chairman != null && chairman instanceof Doctor) {
+            total += ((Doctor) chairman).getArticlesCount();
+        }
+        for (int i = 0; i < memberCount; i++) {
+            if (members[i] instanceof Doctor) {
+                total += ((Doctor) members[i]).getArticlesCount();
+            }
+        }
+        return total;
+    }
+
     // get & set
     public String getCommitteeName() {
         return committeeName;
@@ -66,9 +111,9 @@ public class Committee {
         return chairman;
     }
 
-    public void setChairPerson(Lecturer newChairPerson) throws InvalidActionException {
-        if (newChairPerson == null || !(newChairPerson instanceof Doctor)) {
-            throw new InvalidActionException(InvalidActionException.INVALID_CHAIRPERSON);
+    public void setChairPerson(Doctor newChairPerson) throws InvalidActionException {
+        if (newChairPerson == null) {
+            throw new InvalidActionException("Chairperson cannot be null.");
         }
         this.chairman = newChairPerson;
         newChairPerson.addCommittee(this);
@@ -83,6 +128,7 @@ public class Committee {
     }
 
     // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
+    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     //הדפסה
     @Override
