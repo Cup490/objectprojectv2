@@ -6,9 +6,9 @@
 
 import java.util.Scanner;
 
-public class aliceandelad {
-    public static void info(String[] array, int Count) {
-        for (int i = 0; i < Count; i++) {
+public class AliceAndElad {
+    public static void info(String[] array, int count) {
+        for (int i = 0; i < count; i++) {
             System.out.println(array[i]);
         }
     }
@@ -16,7 +16,7 @@ public class aliceandelad {
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         System.out.println("What College would you like to add a lecturer to? ");
-        String College1 = s.nextLine();
+        String college1 = s.nextLine();
 
         String choices = ("Please choose your option\n " +
                 "0 - Exit\n " +
@@ -35,7 +35,7 @@ public class aliceandelad {
                 "13 - Compare two Committees\n" +
                 "14 - Clone a Committee"
         );
-        College myCollege = new College(College1);
+        College myCollege = new College(college1);
         System.out.println(choices);
         int answer = s.nextInt();
         s.nextLine();
