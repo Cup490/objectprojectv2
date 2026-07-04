@@ -119,6 +119,9 @@ public class College {
         if (committee.getChairman() != null) {
             committee.getChairman().removeCommittee(committee);
         }
+        if (committee.getMemberIndex(newChair.getId()) != -1) {
+            committee.removeMember(newChair);
+        }
         committee.setChairPerson((Doctor) newChair);
     }
 

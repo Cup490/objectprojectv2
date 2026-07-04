@@ -44,7 +44,7 @@ public class Lecturer {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Lecturer)) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Lecturer other = (Lecturer) obj;
         return this.id.equals(other.getId());
     }
