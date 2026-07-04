@@ -83,9 +83,6 @@ public class AliceAndElad {
                         levelUpper = inputLevelOfDegree.trim().toUpperCase();
                     }
 
-                    // Build the correct concrete type so that Doctor/Professor-only features
-                    // (chairing a committee, article tracking, article-count comparisons)
-                    // are actually reachable from the menu.
                     try {
                         Lecturer myLecturer;
                         if (levelUpper.equals("PROF")) {
