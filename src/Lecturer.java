@@ -13,7 +13,7 @@ public class Lecturer {
     private int committeesCount = 0;
 
     // פעולה בונה
-    public Lecturer(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree) {
+    public Lecturer(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree) throws InvalidLecturerNameException, InvalidLecturerIdException {
         this.setLecturerName(lecturerName);
         this.setId(id);
         this.typeOfDegree = typeOfDegree;
@@ -72,11 +72,11 @@ public class Lecturer {
         return lecturerName;
     }
 
-    public void setLecturerName(String lecturerName) {
+    public void setLecturerName(String lecturerName) throws InvalidLecturerNameException {
         if (lecturerName != null && !lecturerName.isEmpty() && lecturerName.matches("[a-zA-Z ]+")) {
             this.lecturerName = lecturerName;
         } else {
-            throw new IllegalArgumentException("Name can only have letters.");
+            throw new InvalidLecturerNameException("Name can only have letters.");
         }
     }
 
@@ -84,11 +84,11 @@ public class Lecturer {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id) throws InvalidLecturerIdException {
         if (id != null && id.matches("\\d{9}")) {
             this.id = id;
         } else {
-            throw new IllegalArgumentException("ID cannot exceed 9 characters.");
+            throw new InvalidLecturerIdException("ID must be exactly 9 digits.");
         }
     }
 

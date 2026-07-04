@@ -4,11 +4,11 @@ public class Doctor extends Lecturer implements Comparable<Doctor> {
     private int articlesCount=0;
 
     // פעולה בונה
-    public Doctor(String lecturerName, String id, String typeOfDegree, double pay){
+    public Doctor(String lecturerName, String id, String typeOfDegree, double pay) throws InvalidLecturerNameException, InvalidLecturerIdException {
         super(lecturerName, id, typeOfDegree, pay, "DOCTOR");
     }
 
-    protected Doctor(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree){
+    protected Doctor(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree) throws InvalidLecturerNameException, InvalidLecturerIdException {
         super(lecturerName, id, typeOfDegree, pay, levelOfDegree);
     }
 

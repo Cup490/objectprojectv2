@@ -3,7 +3,7 @@ public class Professor extends Doctor {
     private String grantingBody;
 
     // פעולה בונה
-    public Professor(String lecturerName, String id, String typeOfDegree, double pay, String grantingBody) {
+    public Professor(String lecturerName, String id, String typeOfDegree, double pay, String grantingBody) throws InvalidLecturerNameException, InvalidLecturerIdException {
         super(lecturerName, id, typeOfDegree, pay, "PROF");
         this.grantingBody=grantingBody;
     }
