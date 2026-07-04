@@ -40,7 +40,7 @@ public class Committee implements Comparable<Committee> {
     }
 
     public Committee cloneCommittee() throws InvalidChairpersonException, AlreadyMemberException, ChairCannotBeMemberException {
-        Committee cloned = new Committee("new-" + this.committeeName);
+        Committee cloned = new Committee(this.committeeName + "-new");
         if (this.chairman != null && this.chairman instanceof Doctor) {
             cloned.setChairPerson((Doctor) this.chairman);
         }
