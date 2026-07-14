@@ -1,11 +1,13 @@
-public class Professor extends Doctor {
+import java.io.Serializable;
+
+public class Professor extends Doctor implements Serializable {
     // תכונות
     private String grantingBody;
 
     // פעולה בונה
     public Professor(String lecturerName, String id, String typeOfDegree, double pay, String grantingBody) throws InvalidLecturerNameException, InvalidLecturerIdException {
         super(lecturerName, id, typeOfDegree, pay, "PROF");
-        this.grantingBody=grantingBody;
+        this.grantingBody = grantingBody;
     }
 
     // פעולות

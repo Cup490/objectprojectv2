@@ -1,16 +1,33 @@
 /*
  * מגישים:
  * אליס ריינס - [216747204]
- [216553420] - אלעד כץ  *
+ * אלעד כץ - [216553420]
  */
 
+import java.io.*;
 import java.util.Scanner;
 
 public class AliceAndElad {
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
-        System.out.println("What College would you like to add a lecturer to? ");
-        String college1 = s.nextLine();
+        College myCollege = null;
+        File dataFile = new File("college_data.dat");
+
+        // --- PART 4: Loading from Binary File ---
+        if (dataFile.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFile))) {
+                myCollege = (College) ois.readObject();
+                System.out.println("System data successfully loaded from file.");
+            } catch (Exception e) {
+                System.out.println("Failed to load data. Starting with a new system.");
+            }
+        }
+
+        if (myCollege == null) {
+            System.out.println("What College would you like to add a lecturer to? ");
+            String college1 = s.nextLine();
+            myCollege = new College(college1);
+        }
 
         String choices = ("Please choose your option\n " +
                 "0 - Exit\n " +
@@ -29,17 +46,12 @@ public class AliceAndElad {
                 "13 - Compare two Committees\n" +
                 "14 - Clone a Committee"
         );
-        College myCollege = new College(college1);
         System.out.println(choices);
         int answer = s.nextInt();
         s.nextLine();
 
         while (answer != 0) {
             switch (answer) {
-                case 0:
-                    System.out.println("the program has ended");
-                    break;
-
                 case 1:
                     System.out.println("Enter lecturer name: ");
                     String inputName = s.nextLine();
@@ -126,13 +138,40 @@ public class AliceAndElad {
                         committeeName = s.nextLine();
                     }
 
+                    // --- PART 4: Deciding Committee generic type during creation ---
+                    System.out.println("Select the degree level for the committee members:");
+                    System.out.println("1 - Regular (Bachelors / Masters)");
+                    System.out.println("2 - Doctors");
+                    System.out.println("3 - Professors");
+                    int typeChoice = s.nextInt();
+                    s.nextLine();
+
                     System.out.print("Enter the Chairperson's ID (Must be a Doctor/Prof): ");
                     String chairId = s.nextLine();
 
                     try {
-                        myCollege.addCommittee(committeeName, chairId);
+                        Lecturer potentialChair = myCollege.findLecturerById(chairId);
+                        if (potentialChair == null) {
+                            throw new LecturerNotFoundException("Lecturer ID not found.");
+                        }
+                        if (!(potentialChair instanceof Doctor)) {
+                            throw new InvalidChairpersonException("The chairperson must be at least a Doctor or Professor.");
+                        }
+
+                        Committee<?> newCommittee;
+                        if (typeChoice == 2) {
+                            newCommittee = new Committee<>(committeeName, Doctor.class);
+                        } else if (typeChoice == 3) {
+                            newCommittee = new Committee<>(committeeName, Professor.class);
+                        } else {
+                            newCommittee = new Committee<>(committeeName, Lecturer.class);
+                        }
+
+                        newCommittee.setChairPerson((Doctor) potentialChair);
+                        myCollege.addCommittee(newCommittee);
                         System.out.println("Committee added successfully with the designated chairperson!");
-                    } catch (CommitteeAlreadyExistsException | InvalidChairpersonException | LecturerNotFoundException | AlreadyMemberException e) {
+
+                    } catch (Exception e) { // Catching Exception covers all custom exceptions here
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -147,7 +186,7 @@ public class AliceAndElad {
                     try {
                         myCollege.addLecturerToCommittee(memberIdToAdd, commName3);
                         System.out.println("The lecturer was successfully added as a member of the committee!");
-                    } catch (LecturerNotFoundException | CommitteeNotFoundException | ChairCannotBeMemberException | AlreadyMemberException e) {
+                    } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -282,8 +321,8 @@ public class AliceAndElad {
                     System.out.print("Enter the second Committee Name: ");
                     String cName2 = s.nextLine();
 
-                    Committee c1 = myCollege.findCommitteeByName(cName1);
-                    Committee c2 = myCollege.findCommitteeByName(cName2);
+                    Committee<?> c1 = myCollege.findCommitteeByName(cName1);
+                    Committee<?> c2 = myCollege.findCommitteeByName(cName2);
 
                     if (c1 != null && c2 != null) {
                         System.out.println("Compare by:\n1 - Number of members\n2 - Total articles written by members");
@@ -311,11 +350,11 @@ public class AliceAndElad {
                 case 14:
                     System.out.print("Enter the name of the Committee you want to clone: ");
                     String targetClone = s.nextLine();
-                    Committee original = myCollege.findCommitteeByName(targetClone);
+                    Committee<?> original = myCollege.findCommitteeByName(targetClone);
 
                     if (original != null) {
                         try {
-                            Committee clonedCommittee = original.cloneCommittee();
+                            Committee<?> clonedCommittee = original.cloneCommittee();
                             myCollege.addCommittee(clonedCommittee);
                             System.out.println("Committee successfully cloned! New name: " + clonedCommittee.getCommitteeName());
                         } catch (CommitteeAlreadyExistsException | InvalidChairpersonException | AlreadyMemberException | ChairCannotBeMemberException e) {
@@ -332,6 +371,14 @@ public class AliceAndElad {
             System.out.println(choices);
             answer = s.nextInt();
             s.nextLine();
+        }
+
+        System.out.println("the program has ended");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFile))) {
+            oos.writeObject(myCollege);
+            System.out.println("System data successfully saved.");
+        } catch (IOException e) {
+            System.out.println("Error saving system data: " + e.getMessage());
         }
     }
 }

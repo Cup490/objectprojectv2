@@ -1,9 +1,11 @@
-public class Department {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Department implements Serializable {
     // תכונות
     private String departmentName;
     private int studentsCount;
-    private Lecturer[] lecturers = new Lecturer[1];
-    private int lecturersCount = 0;
+    private ArrayList<Lecturer> lecturers = new ArrayList<>();
 
     // פעולה בונה
     public Department(String departmentName, int studentsCount) {
@@ -16,10 +18,7 @@ public class Department {
         if (getLecturerIndex(newLecturer.getId()) != -1) {
             throw new AlreadyInDepartmentException("This lecturer is already assigned to a department.");
         }
-        if (lecturersCount == lecturers.length) {
-            doubleLecturersArraySize();
-        }
-        lecturers[lecturersCount++] = newLecturer;
+        lecturers.add(newLecturer);
     }
 
     @Override
@@ -31,17 +30,9 @@ public class Department {
     }
 
     // פעולות עזר
-    private void doubleLecturersArraySize() {
-        Lecturer[] newLecturers = new Lecturer[lecturers.length * 2];
-        for (int i = 0; i < lecturersCount; i++) {
-            newLecturers[i] = lecturers[i];
-        }
-        lecturers = newLecturers;
-    }
-
     public int getLecturerIndex(String lecturerId) {
-        for (int i = 0; i < lecturersCount; i++) {
-            if (lecturers[i].getId().equals(lecturerId)) {
+        for (int i = 0; i < lecturers.size(); i++) {
+            if (lecturers.get(i).getId().equals(lecturerId)) {
                 return i;
             }
         }
@@ -65,23 +56,20 @@ public class Department {
         this.studentsCount = studentsCount;
     }
 
-    public Lecturer[] getLecturers() {
+    public ArrayList<Lecturer> getLecturers() {
         return lecturers;
     }
 
     public int getLecturersCount() {
-        return lecturersCount;
+        return lecturers.size();
     }
-
-    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
-    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     //הדפסה
     @Override
     public String toString() {
         StringBuilder lecturersPrint = new StringBuilder();
-        for (int i = 0; i < lecturersCount; i++) {
-            lecturersPrint.append(lecturers[i].getLecturerName()).append(", ");
+        for (Lecturer lecturer : lecturers) {
+            lecturersPrint.append(lecturer.getLecturerName()).append(", ");
         }
         String finalLecturers = (lecturersPrint.length() > 0) ?
                 lecturersPrint.substring(0, lecturersPrint.length() - 2) : "No lecturers yet.";

@@ -1,4 +1,7 @@
-public class Lecturer {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Lecturer implements Serializable {
     // תכונות
     public enum LevelOfDegree {
         BACHELORS, MASTERS, DOCTOR, PROF
@@ -9,8 +12,7 @@ public class Lecturer {
     private LevelOfDegree levelOfDegree;
     private double pay;
     private Department department;
-    private Committee[] committees = new Committee[1];
-    private int committeesCount = 0;
+    private ArrayList<Committee<?>> committees = new ArrayList<>();
 
     // פעולה בונה
     public Lecturer(String lecturerName, String id, String typeOfDegree, double pay, String levelOfDegree) throws InvalidLecturerNameException, InvalidLecturerIdException {
@@ -22,23 +24,19 @@ public class Lecturer {
     }
 
     // פעולות
-    public void addCommittee(Committee committee) throws AlreadyMemberException {
+    public void addCommittee(Committee<?> committee) throws AlreadyMemberException {
         if (getCommitteeIndex(committee.getCommitteeName()) != -1) {
             throw new AlreadyMemberException("Lecturer is already a member of this committee.");
         }
-        if (committeesCount == committees.length) {
-            doubleCommitteesArraySize();
-        }
-        committees[committeesCount++] = committee;
+        committees.add(committee);
     }
 
-    public void removeCommittee(Committee committee) throws NotInCommitteeException {
+    public void removeCommittee(Committee<?> committee) throws NotInCommitteeException {
         int index = getCommitteeIndex(committee.getCommitteeName());
         if (index == -1) {
             throw new NotInCommitteeException("Lecturer is not a member of this committee.");
         }
-        committees[index] = committees[--committeesCount];
-        committees[committeesCount] = null;
+        committees.remove(index);
     }
 
     @Override
@@ -50,17 +48,9 @@ public class Lecturer {
     }
 
     // פעולות עזר
-    private void doubleCommitteesArraySize() {
-        Committee[] newCommittees = new Committee[committees.length * 2];
-        for (int i = 0; i < committeesCount; i++) {
-            newCommittees[i] = committees[i];
-        }
-        committees = newCommittees;
-    }
-
     private int getCommitteeIndex(String committeeName) {
-        for (int i = 0; i < committeesCount; i++) {
-            if (committees[i].getCommitteeName().equalsIgnoreCase(committeeName)) {
+        for (int i = 0; i < committees.size(); i++) {
+            if (committees.get(i).getCommitteeName().equalsIgnoreCase(committeeName)) {
                 return i;
             }
         }
@@ -116,23 +106,20 @@ public class Lecturer {
         this.department = department;
     }
 
-    public Committee[] getCommittees() {
+    public ArrayList<Committee<?>> getCommittees() {
         return committees;
     }
 
     public int getCommitteesCount() {
-        return committeesCount;
+        return committees.size();
     }
-
-    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
-    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     // הדפסה
     @Override
     public String toString() {
         StringBuilder committeesPrint = new StringBuilder();
-        for (int i = 0; i < committeesCount; i++) {
-            committeesPrint.append(committees[i].getCommitteeName()).append(", ");
+        for (Committee<?> committee : committees) {
+            committeesPrint.append(committee.getCommitteeName()).append(", ");
         }
         String finalCommittees = (committeesPrint.length() > 0) ?
                 committeesPrint.substring(0, committeesPrint.length() - 2) : "No committees yet.";

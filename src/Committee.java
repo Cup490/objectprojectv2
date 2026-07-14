@@ -1,51 +1,51 @@
-public class Committee implements Comparable<Committee> {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Committee<T extends Lecturer> implements Comparable<Committee<?>>, Serializable {
     // תכונות
     private String committeeName;
     private Lecturer chairman = null;
-    private Lecturer[] members = new Lecturer[1];
-    private int memberCount = 0;
+    private ArrayList<T> members = new ArrayList<>();
+    private Class<T> memberType; // Enforces part 4 generic rules
 
     // פעולה בונה
-    public Committee(String committeeName) {
+    public Committee(String committeeName, Class<T> memberType) {
         this.committeeName = committeeName;
+        this.memberType = memberType;
     }
 
     // פעולות
-    public void addMember(Lecturer newMember) throws ChairCannotBeMemberException, AlreadyMemberException {
+    public void addMember(T newMember) throws ChairCannotBeMemberException, AlreadyMemberException {
         if (chairman != null && chairman.getId().equals(newMember.getId())) {
             throw new ChairCannotBeMemberException("The chairman cannot be added as a regular member.");
         }
         if (getMemberIndex(newMember.getId()) != -1) {
             throw new AlreadyMemberException("This lecturer is already a member of the committee.");
         }
-        if (memberCount == members.length) {
-            doubleMembersArraySize();
-        }
-        members[memberCount++] = newMember;
+        members.add(newMember);
         newMember.addCommittee(this);
     }
 
-    public void removeMember(Lecturer member) throws NotInCommitteeException {
+    public void removeMember(T member) throws NotInCommitteeException {
         int index = getMemberIndex(member.getId());
         if (index == -1) {
             throw new NotInCommitteeException("This lecturer is not a member of the committee.");
         }
-        members[index] = members[--memberCount];
-        members[memberCount] = null;
+        members.remove(index);
         member.removeCommittee(this);
     }
 
-    public int compareByTotalArticles(Committee other) {
+    public int compareByTotalArticles(Committee<?> other) {
         return Integer.compare(this.getTotalArticles(), other.getTotalArticles());
     }
 
-    public Committee cloneCommittee() throws InvalidChairpersonException, AlreadyMemberException, ChairCannotBeMemberException {
-        Committee cloned = new Committee(this.committeeName + "-new");
+    public Committee<T> cloneCommittee() throws InvalidChairpersonException, AlreadyMemberException, ChairCannotBeMemberException {
+        Committee<T> cloned = new Committee<>(this.committeeName + "-new", this.memberType);
         if (this.chairman != null && this.chairman instanceof Doctor) {
             cloned.setChairPerson((Doctor) this.chairman);
         }
-        for (int i = 0; i < this.memberCount; i++) {
-            cloned.addMember(this.members[i]);
+        for (T member : members) {
+            cloned.addMember(member);
         }
         return cloned;
     }
@@ -54,27 +54,19 @@ public class Committee implements Comparable<Committee> {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Committee)) return false;
-        Committee other = (Committee) obj;
+        Committee<?> other = (Committee<?>) obj;
         return this.committeeName.equalsIgnoreCase(other.getCommitteeName());
     }
 
     @Override
-    public int compareTo(Committee other) {
-        return Integer.compare(this.memberCount, other.getMemberCount());
+    public int compareTo(Committee<?> other) {
+        return Integer.compare(this.members.size(), other.getMemberCount());
     }
 
     // פעולות עזר
-    private void doubleMembersArraySize() {
-        Lecturer[] newMembers = new Lecturer[members.length * 2];
-        for (int i = 0; i < memberCount; i++) {
-            newMembers[i] = members[i];
-        }
-        members = newMembers;
-    }
-
     public int getMemberIndex(String lecturerId) {
-        for (int i = 0; i < memberCount; i++) {
-            if (members[i].getId().equals(lecturerId)) {
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).getId().equals(lecturerId)) {
                 return i;
             }
         }
@@ -86,9 +78,9 @@ public class Committee implements Comparable<Committee> {
         if (chairman != null && chairman instanceof Doctor) {
             total += ((Doctor) chairman).getArticlesCount();
         }
-        for (int i = 0; i < memberCount; i++) {
-            if (members[i] instanceof Doctor) {
-                total += ((Doctor) members[i]).getArticlesCount();
+        for (T member : members) {
+            if (member instanceof Doctor) {
+                total += ((Doctor) member).getArticlesCount();
             }
         }
         return total;
@@ -115,27 +107,28 @@ public class Committee implements Comparable<Committee> {
         newChairPerson.addCommittee(this);
     }
 
-    public Lecturer[] getMembers() {
+    public ArrayList<T> getMembers() {
         return members;
     }
 
     public int getMemberCount() {
-        return memberCount;
+        return members.size();
     }
 
-    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
-    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
+    public Class<T> getMemberType() {
+        return memberType;
+    }
 
     //הדפסה
     @Override
     public String toString() {
         StringBuilder membersPrint = new StringBuilder();
-        for (int i = 0; i < memberCount; i++) {
-            membersPrint.append(members[i].getLecturerName()).append(", ");
+        for (T member : members) {
+            membersPrint.append(member.getLecturerName()).append(", ");
         }
         String finalMembers = (membersPrint.length() > 0) ?
                 membersPrint.substring(0, membersPrint.length() - 2) : "No members yet.";
-        return "Committee Name: " + committeeName + "\n" +
+        return "Committee Name: " + committeeName + " [Type: " + memberType.getSimpleName() + "]\n" +
                 "Chairperson: " + (chairman != null ? chairman.getLecturerName() : "None") + "\n" +
                 "Members: [" + finalMembers + "]\n";
     }

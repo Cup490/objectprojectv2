@@ -1,7 +1,9 @@
-public class Doctor extends Lecturer implements Comparable<Doctor> {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Doctor extends Lecturer implements Comparable<Doctor>, Serializable {
     // תכונות
-    private String[] articles=new String[1];
-    private int articlesCount=0;
+    private ArrayList<String> articles = new ArrayList<>();
 
     // פעולה בונה
     public Doctor(String lecturerName, String id, String typeOfDegree, double pay) throws InvalidLecturerNameException, InvalidLecturerIdException {
@@ -17,10 +19,7 @@ public class Doctor extends Lecturer implements Comparable<Doctor> {
         if (getArticleIndex(article) != -1) {
             throw new ArticleAlreadyExistsException("This article is already in the list.");
         }
-        if (articlesCount == articles.length) {
-            doubleArticlesArraySize();
-        }
-        articles[articlesCount++] = article;
+        articles.add(article);
     }
 
     @Override
@@ -28,56 +27,39 @@ public class Doctor extends Lecturer implements Comparable<Doctor> {
         if (!super.equals(obj)) return false;
         if (!(obj instanceof Doctor)) return false;
         Doctor other = (Doctor) obj;
-        if (this.articlesCount != other.articlesCount) return false;
-        for (int i = 0; i < this.articlesCount; i++) {
-            if (!this.articles[i].equalsIgnoreCase(other.articles[i])) {
-                return false;
-            }
-        }
-        return true;
+        return this.articles.equals(other.articles);
     }
 
     @Override
     public int compareTo(Doctor other) {
-        return Integer.compare(this.articlesCount, other.getArticlesCount());
+        return Integer.compare(this.articles.size(), other.getArticlesCount());
     }
 
     // פעולות עזר
     private int getArticleIndex(String articleName) {
-        for (int i = 0; i < articlesCount; i++) {
-            if (articles[i].equalsIgnoreCase(articleName)) {
+        for (int i = 0; i < articles.size(); i++) {
+            if (articles.get(i).equalsIgnoreCase(articleName)) {
                 return i;
             }
         }
         return -1;
     }
 
-    private void doubleArticlesArraySize() {
-        String[] newArticles = new String[articles.length * 2];
-        for (int i = 0; i < articlesCount; i++) {
-            newArticles[i] = articles[i];
-        }
-        articles = newArticles;
-    }
-
     // get & set
-    public String[] getArticles() {
+    public ArrayList<String> getArticles() {
         return articles;
     }
 
-    public int getArticlesCount(){
-        return articlesCount;
+    public int getArticlesCount() {
+        return articles.size();
     }
-
-    // אין פעולות set עבור המערכים מכיוון שהם יכולים להתעדכן רק דרך פעולות ולא על ידי המשתמש
-    // אין פעולת set למשתנים הסופרים מכיוון שהם מתעדכנים אוטומטית ע"י הפעולות ושינוי ישיר שלו עלול ליצור חוסר התאמה בין הספירה לתוכן המערך בפועל
 
     // הדפסה
     @Override
     public String toString() {
         StringBuilder articlesPrint = new StringBuilder();
-        for (int i = 0; i < articlesCount; i++) {
-            articlesPrint.append(articles[i]).append(", ");
+        for (String article : articles) {
+            articlesPrint.append(article).append(", ");
         }
 
         String finalArticles = (articlesPrint.length() > 0) ?
